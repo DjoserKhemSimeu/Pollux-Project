@@ -94,19 +94,43 @@ public class Agents {
 	}
 	public void majColor() {
 	}
-	public int scan() {
+	public void scan() {
 		
 		ArrayList<Double>distances=new ArrayList<Double>();
-		moteurs.l1.rotate(360,true);
-		while(moteurs.l1.isMoving()) {
+		moteurs.l1.endSynchronization();
+		moteurs.l1.setSpeed(50);
+		moteurs.r1.setSpeed(50);
+		
+		moteurs.l1.rotate(Actionneurs.QuartT,true);
+		moteurs.r1.rotate(-Actionneurs.QuartT,true);
+		
+		while(moteurs.isMoving()) {
 			
 			distances.add(getDistance());
 			System.out.println(getDistance());
 		
 		}
-		System.out.println(distances.size());
+		moteurs.addAngle(90,true);
+		moteurs.l1.startSynchronization();
 		
-		return distances.size();
+		double size=distances.size();
+		double i=1;
+		double delta=0.2;
+		
+		while (i<size-1) {
+			double prec=distances.get((int)(size-i-2));
+			double now= distances.get((int)(size-i-1));
+			double next=distances.get((int)(size-i));
+			
+			if(Math.abs(prec-now)>delta &&Math.abs( next-now)>delta) {
+				System.out.println(size);
+				System.out.println("###########################");
+				int goal=(int)(i*90.0/size);
+				System.out.println(goal);
+			}
+			i++;
+		}
+		
 		//ArrayList<Double> discontinuitées	=new ArrayList<Double>();
 		
 		
@@ -118,10 +142,7 @@ public class Agents {
 		//e.getNumCase();
 		while(!Button.ENTER.isDown()) {
 			colorT=capteurs.getColor();
-			if (b) {
-			 s=scan();
-			b=false;
-			}
+			
 			
 			
 		
@@ -156,6 +177,7 @@ public class Agents {
 		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);
 		robot.scan();
 		Delay.msDelay(10000);
+		;
 		
 		
 		
