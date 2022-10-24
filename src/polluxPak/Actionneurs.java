@@ -36,7 +36,7 @@ public class Actionneurs {
 		//r1.setSpeed(1000);
 		l1.synchronizeWith(new RegulatedMotor[] {r1});
 		l1.startSynchronization();
-		angle=180;
+		angle=0;
 	}
 	public Actionneurs() {
 		// TODO Auto-generated constructor stub
@@ -92,6 +92,37 @@ public class Actionneurs {
 	public double getAngle() {
 		return angle;
 	}
+	
+	public void tournerTo(int différence) {
+		l1.endSynchronization();
+		int i=0;
+		if(différence>0) {
+			while(différence<i) {
+				tournerScan(true);
+				i--;
+				
+			}
+		}else {
+			while(différence>i) {
+				tournerScan(false);
+				i++;
+			}
+		}
+		l1.startSynchronization();
+	}
+	public void tournerScan(boolean dir) {
+		l1.endSynchronization();
+		if(dir==DROITE) {
+			r1.rotate(-3,true);
+			l1.rotate(3, true);
+			addAngle(1,DROITE);
+		}else if(dir==GAUCHE) {
+			l1.rotate(-3, true);
+			r1.rotate(3, true);
+			addAngle(1,GAUCHE);
+		}
+		l1.startSynchronization();
+	}
 	public void stop() {
 		l1.startSynchronization();
 		l1.stop();
@@ -103,24 +134,32 @@ public class Actionneurs {
 		pince.rotate(3*QuartT);
 		pince.rotate(-3*QuartT);
 	}
+	public void addAngle(int deg,boolean dir) {
+		angle%=360;
+		if(dir==DROITE) {
+			angle= angle +deg;
+		}else {
+			if(angle==0) {
+				angle=360-deg;
+			}else if(angle<deg) {
+				angle=360-(deg-angle);
+			}
+			else {
+			angle= angle -deg;
+			}
+		}
+	}
 	public void tourner(boolean dir,double nbQuartT) {
 		l1.endSynchronization();
-		angle%=360;
+		
 		if(dir==DROITE) {
 			r1.rotate((int)(-QuartT*nbQuartT),true);
 			l1.rotate((int)(QuartT*nbQuartT),true);
-			l1.waitComplete();
-			l1.stop(true);
-			r1.stop(true);
-			angle= angle +90*nbQuartT;
+			addAngle((int)(90*nbQuartT),DROITE);
 		}else if(dir==GAUCHE) {
 			l1.rotate((int)(-QuartT*nbQuartT),true);
 			r1.rotate((int)(QuartT*nbQuartT),true);
-			if(angle==0) {
-				angle=360-90*nbQuartT;
-			}else {
-			angle= angle -90*nbQuartT;
-			}
+			addAngle((int)(90*nbQuartT),GAUCHE);
 		}
 		l1.startSynchronization();
 	}
@@ -145,18 +184,16 @@ public class Actionneurs {
 
 	public static void main (String[]args) {
 		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D);
-		ExecutorService es=Executors.newSingleThreadExecutor();
-	
-	
-			a.tourner(true,360);
-			
-	
-		
-		while(a.r1.isMoving()) {
-			System.out.println(a.r1.getTachoCount());
+		//a.tournerTo(90);
+		//Delay.msDelay(10000);
+		int i=0;
+		while (i<90) {
+			a.tournerScan(false);
+			i++;
 		}
-		System.out.println("a");
+		Delay.msDelay(10000);
 		
+	
 		
 	
 
