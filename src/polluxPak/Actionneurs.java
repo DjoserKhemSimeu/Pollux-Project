@@ -96,9 +96,11 @@ public class Actionneurs {
 		tournerR(true,2);
 		
 	}
+	// return true si un des moteurs(roue) est en mouvement
 	public boolean isMoving() {
 		return(l1.isMoving()||r1.isMoving());
 	}
+	
 	
 	public double getAngle() {
 		return angle;
