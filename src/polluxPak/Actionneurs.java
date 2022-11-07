@@ -191,7 +191,7 @@ public class Actionneurs {
 			a.tournerScan(false);
 			i++;
 		}
-		Delay.msDelay(10000);
+		Delay.msDelay(5000);
 		
 	
 		
