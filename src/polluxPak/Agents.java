@@ -111,7 +111,7 @@ public class Agents {
 		}
 		return res;
 	}
-	public void scanf() {
+	/*public void scanf() {
 		ArrayList<Double> dist=new ArrayList<Double>();
 		moteurs.l1.endSynchronization();
 		moteurs.l1.setSpeed(35);
@@ -153,6 +153,13 @@ public class Agents {
 		
 	
 		
+	}*/
+	public double tabMoy(double[]d) {
+		double sum=0;
+		for(int i=0;i<d.length;i++) {
+			sum+=d[i];
+		}
+		return sum/d.length;
 	}
 
 	public int scan() {
@@ -168,11 +175,14 @@ public class Agents {
 
 
 		while(moteurs.isMoving()) {
-			
+			double []moy=new double[5];
+			for(int i=0;i<moy.length;i++) {
+				moy[i]= getDistance();
+			}
 
-			distances.add(getDistance());
+			distances.add(tabMoy(moy));
 
-			System.out.println(getDistance());
+			System.out.println(tabMoy(moy));
 
 
 
@@ -296,7 +306,7 @@ public class Agents {
 	}
 	public static void main (String[]args) throws IOException {
 		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);
-		robot.scanf();
+		robot.scan();
 		while(!Button.ENTER.isDown()) {
 
 		}
