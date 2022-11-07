@@ -98,12 +98,12 @@ public class Agents {
 	}
 	public static HashMap<Integer,Double>chercheDis(ArrayList<Double> dist){
 		HashMap<Integer,Double> res=new HashMap<Integer,Double>();
-		double delta=0.15;
+		double delta=0.25;
 		int i=1;
 		double prec=dist.get(0);
 		while (i<dist.size()) {
 			if(Math.abs(dist.get(i)-prec)>delta) {
-				res.put(i*90/dist.size(),dist.get(i));
+				res.put(i*90/dist.size(),Math.abs(dist.get(i)-prec));
 			}
 			prec=dist.get(i);
 			i++;
@@ -120,51 +120,38 @@ public class Agents {
 		moteurs.r1.rotate(-Actionneurs.QuartT,true);
 		while(moteurs.l1.isMoving()) {
 			dist.add(getDistance());
-			
 		}
-		moteurs.addAngle(90,true);
-		int size=dist.size();
-		double delta=0.25;
-		ArrayList<Double>disDist=new ArrayList<Double>();
-		ArrayList<Integer>disAngle=new ArrayList<Integer>();
-		int i=1;
+		int i=0;
+		double sum=0;
+		while(i<dist.size()) {
+			sum=sum+dist.get(i);
+			i++;
+		}
+		i=0;
+		double sum2=0;
+		while (i<dist.size()) {
+			sum2+=dist.get(i)*dist.get(i);
+			i++;
+		}
 		
-		while(i<size) {
-			double now=dist.get(i);
-			double prec=dist.get(i-1);
-			if(Math.abs(now-prec)>delta) {
-				int agl=i*90/size;
-				disAngle.add(agl);
-				disDist.add(now);
-				System.out.println("#################");
-				System.out.println("idx: "+i+" agl :"+size );
-				System.out.println("ecart: "+Math.abs(now-prec));
+		double mean=sum/dist.size();
+		double sqrt=Math.sqrt((mean*mean)-(sum2/dist.size()));
+		i=0;
+		while(i<dist.size()) {
+			if(Math.abs(mean-dist.get(i))>sqrt) {
+				dist.remove(i);
 			}
 			i++;
 		}
-		System.out.println("_________________");
-		for(Integer s: disAngle) {
-			System.out.print(s+" ");
-		}
-	/*	ArrayList<Integer> pallet=new ArrayList<Integer>(disAngle.size()/2);
-		int compt=0;
-		while (compt+1<disAngle.size()) {
-			int deb=disAngle.get(compt);
-			int fin= disAngle.get(compt+1);
-			pallet.add((deb+fin)/2);
-			compt++;
-		}*/
-		for(Integer s: disAngle) {
-			System.out.print(s+" ");
-		}
-		/*System.out.println();
-		for(Integer r: pallet) {
-			System.out.print(r+" ");
-		}*/
-		
 	
 		
-
+		moteurs.addAngle(90,true);
+		HashMap<Integer,Double> dict=chercheDis(dist);
+		System.out.println(dict);
+		
+		
+		
+	
 		
 	}
 
