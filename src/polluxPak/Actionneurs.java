@@ -16,18 +16,17 @@ import lejos.utility.Delay;
 public class Actionneurs {
 	public static final int QuartT =200;
 	private static final int DQuartT =200;
-	
-// attributs de direction
+
 	private static final boolean DROITE=true;
 	private static final boolean GAUCHE=false;
-	
-	RegulatedMotor l1; // roue gauche
-	RegulatedMotor r1; // roue droite
-	private RegulatedMotor pince; // pince
-	private double angle; // direction
+
+	RegulatedMotor l1;
+	RegulatedMotor r1;
+	private RegulatedMotor pince;
+	private double angle;
 	
 
-// ce constructeur permet d'initialiser nos attributs d'instance, notamment d'expliciter le lien entre les ports, les attributs et méthodes associées à ceux-ci.
+
 	public Actionneurs (Port A,Port B,Port D) {
 		l1 = new EV3LargeRegulatedMotor(A);
 		r1= new EV3LargeRegulatedMotor(B);
@@ -42,25 +41,20 @@ public class Actionneurs {
 	public Actionneurs() {
 		// TODO Auto-generated constructor stub
 	}
-	// méthode faisant tourner le moteur vers la gauche jusqu'à l'angle limite de valeur t ;
 	public void rotateG(int t) {
 		l1.endSynchronization();
 		l1.rotate(t,true);
 		l1.startSynchronization();
 		
 	}
-	
-	// méthode faisant tourner le moteur vers la droite jusqu'à l'angle limite de valeur t ;
 	public void rotateR(int t) {
 		l1.endSynchronization();
-		r1.rotateTo(t,true); 
+		r1.rotateTo(t,true);
 		r1.waitComplete();
 		r1.stop();
 		l1.startSynchronization();
 		
 	}
-	
-	// méthode qui synchronise les deux roues afin qu'elles avancent au même rythme, le temps t passé en paramètre;
 	public  void avance(int t) {
 		l1.startSynchronization();
 			l1.forward();
@@ -69,23 +63,19 @@ public class Actionneurs {
 			Delay.msDelay(t);
 			
 	}
-	
-	// méthode qui synchronise les deux roues afin qu'elles avancent au même rythme, sans limite de temps;
 	public  void avance() {
 		l1.startSynchronization();
 		l1.forward();
 		r1.forward();
-		l1.endSynchronization();		
+		l1.endSynchronization();
+		
 }
-	// méthode qui synchronise les deux roues afin qu'elles reculent au même rythme, sans limite de temps;
 	public void recule() {
 		l1.startSynchronization();
 		l1.backward();
 		r1.backward();
 		l1.endSynchronization();
 	}
-	
-	// méthode qui arrête les deux roues puis ouvre les pinces afin que Pollux se libère du palet qu'il a dans ses pinces
 	public void lacherPallet() {
 		stop();
 		pince.rotate(3*QuartT);
@@ -96,12 +86,9 @@ public class Actionneurs {
 		tournerR(true,2);
 		
 	}
-	// return true si un des moteurs(roue) est en mouvement
 	public boolean isMoving() {
 		return(l1.isMoving()||r1.isMoving());
 	}
-	
-	
 	public double getAngle() {
 		return angle;
 	}
@@ -123,7 +110,6 @@ public class Actionneurs {
 		}
 		l1.startSynchronization();
 	}
-	
 	public void tournerScan(boolean dir) {
 		l1.endSynchronization();
 		if(dir==DROITE) {
@@ -137,7 +123,6 @@ public class Actionneurs {
 		}
 		l1.startSynchronization();
 	}
-	
 	public void stop() {
 		l1.startSynchronization();
 		l1.stop();
@@ -145,12 +130,10 @@ public class Actionneurs {
 
 		l1.endSynchronization();
 	}
-	
 	public void actionPince() {
 		pince.rotate(3*QuartT);
 		pince.rotate(-3*QuartT);
 	}
-	
 	public void addAngle(int deg,boolean dir) {
 		angle%=360;
 		if(dir==DROITE) {
@@ -166,7 +149,6 @@ public class Actionneurs {
 			}
 		}
 	}
-	
 	public void tourner(boolean dir,double nbQuartT) {
 		l1.endSynchronization();
 		
@@ -181,7 +163,6 @@ public class Actionneurs {
 		}
 		l1.startSynchronization();
 	}
-	
 	public void tournerR(boolean dir,int nbQuartT) {
 		l1.endSynchronization();
 		if(dir==DROITE) {
@@ -199,6 +180,17 @@ public class Actionneurs {
 		}
 		l1.startSynchronization();
 	}
+	public void endS() {
+		l1.endSynchronization();
+	}
+	public void startS() {
+		l1.startSynchronization();
+	}
+	public void speed(int s) {
+		l1.setSpeed(s);
+		r1.setSpeed(s);
+	}
+	
 
 
 	public static void main (String[]args) {
