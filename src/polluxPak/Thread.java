@@ -15,9 +15,19 @@ public class Thread {
 	public void run(){
 		switch(courant.getNum()){
 		case 1: 
-			
-
-
+			pollux.moteurs.avance();
+			if(pollux.capteurs.getTouch())
+				pollux.moteurs.actionPince();
+			pollux.moteurs.tourner(false, 2);
+			while(pollux.capteurs.getDistance()>0.2){
+				pollux.moteurs.avance();
+			}
+			pollux.moteurs.tourner(true, 2);
+			while(pollux.capteurs.getColor()!= "white"){
+				pollux.moteurs.avance();
+			}
+			pollux.moteurs.lacherPallet();
+			courant = Etat.B1;			
 		case 2:
 			pollux.getEspace().getZone();
 			int idx=pollux.getEspace().getIJ()[0];
@@ -57,7 +67,7 @@ public class Thread {
 
 
 		case 6:
-
+			pollux.scanf(360);
 		case 7:
 
 		case 8:
