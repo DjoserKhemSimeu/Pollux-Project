@@ -7,9 +7,9 @@ public class Thread {
 	public Thread() {
 		// TODO Auto-generated constructor stub
 	}
-	public Thread(Etat etatCourant, Agents a){
+	public Thread( Agents a){
 		pollux = a; 
-		courant = etatCourant;
+		courant = Etat.P0;
 	}
 
 	public void run(){
@@ -87,15 +87,18 @@ public class Thread {
 
 		case 4:
 			
+			
 
 		case 5:
 
 
 
 		case 6:
+			pollux.scanf(360);
 
 		case 7:
-			int i=pollux.getEspace().getIJ()[0];
+			
+			int but=0;
 			pollux.moteurs.tournerR(true,180);
 			pollux.moteurs.l1.startSynchronization();
 			while(pollux.getColor()=="none") {
@@ -105,6 +108,7 @@ public class Thread {
 			pollux.moteurs.r1.stop();
 			pollux.moteurs.l1.stop();
 			pollux.moteurs.l1.endSynchronization();
+			int i=pollux.getEspace().getIJ()[0];
 			switch(i%3) {
 			case 0:
 				pollux.moteurs.tourner(true,1);
@@ -117,9 +121,36 @@ public class Thread {
 			pollux.moteurs.l1.startSynchronization();
 			pollux.moteurs.l1.forward();
 			pollux.moteurs.r1.forward();
-			while(pollux.getDistance()>0.2 && !pollux.detectionPallet()) {
+			while(pollux.getDistance()>0.2 ) {
+				if( pollux.detectionPallet()) {
+					but++;
+					pollux.moteurs.r1.stop();
+					pollux.moteurs.l1.stop();
+					pollux.moteurs.l1.endSynchronization();
+					switch(i%3) {
+					case 0:
+						pollux.moteurs.tourner(true,1);
+			
+					case 1:
+						pollux.moteurs.tourner(false,1);
+					case 2:
+						pollux.moteurs.tourner(false,1);
+					}
+					pollux.moteurs.l1.startSynchronization();
+					pollux.moteurs.l1.forward();
+					pollux.moteurs.r1.forward();
+					while(pollux.getColor()!="white") {
+						
+					}
+					pollux.moteurs.r1.stop();
+					pollux.moteurs.l1.stop();
+					pollux.moteurs.l1.endSynchronization();
+					break;
+				}
 				
-				
+			}
+			if(but>0) {
+				break;
 			}
 			pollux.moteurs.r1.stop();
 			pollux.moteurs.l1.stop();
@@ -139,9 +170,138 @@ public class Thread {
 			pollux.moteurs.l1.forward();
 			pollux.moteurs.r1.forward();
 			
+			while(pollux.getDistance()>1.5) {
+				
+			}
+			pollux.moteurs.r1.stop();
+			pollux.moteurs.l1.stop();
+			
+			pollux.moteurs.l1.endSynchronization();
+			switch(i%3) {
+			case 0:
+				pollux.moteurs.tourner(false,1);
+	
+			case 1:
+				pollux.moteurs.tourner(true,1);
+			case 2:
+				pollux.moteurs.tourner(true,1);
+			}
+			pollux.moteurs.l1.startSynchronization();
+			pollux.moteurs.l1.forward();
+			pollux.moteurs.r1.forward();
+			
+			while(pollux.getDistance()>0.2 ) {
+				if( pollux.detectionPallet()) {
+					but++;
+					pollux.moteurs.r1.stop();
+					pollux.moteurs.l1.stop();
+					pollux.moteurs.l1.endSynchronization();
+					switch(i%3) {
+					case 0:
+						pollux.moteurs.tourner(true,1);
+			
+					case 1:
+						pollux.moteurs.tourner(false,1);
+					case 2:
+						pollux.moteurs.tourner(false,1);
+					}
+					pollux.moteurs.l1.startSynchronization();
+					pollux.moteurs.l1.forward();
+					pollux.moteurs.r1.forward();
+					while(pollux.getColor()!="white") {
+						
+					}
+					pollux.moteurs.r1.stop();
+					pollux.moteurs.l1.stop();
+					pollux.moteurs.l1.endSynchronization();
+					break;
+				}
+				
+			}
+			if(but>0) {
+				break;
+			}
+			pollux.moteurs.r1.stop();
+			pollux.moteurs.l1.stop();
+			
+			pollux.moteurs.l1.endSynchronization();
+			switch(i%3) {
+			case 0:
+				pollux.moteurs.tourner(true,1);
+	
+			case 1:
+				pollux.moteurs.tourner(false,1);
+			case 2:
+				pollux.moteurs.tourner(false,1);
+			}
+		
+			pollux.moteurs.l1.startSynchronization();
+			pollux.moteurs.l1.forward();
+			pollux.moteurs.r1.forward();
+			pollux.moteurs.l1.startSynchronization();
+			pollux.moteurs.l1.forward();
+			pollux.moteurs.r1.forward();
+			
+			while(pollux.getDistance()>1.5) {
+				
+			}
+			pollux.moteurs.r1.stop();
+			pollux.moteurs.l1.stop();
+			
+			pollux.moteurs.l1.endSynchronization();
+			switch(i%3) {
+			case 0:
+				pollux.moteurs.tourner(true,1);
+	
+			case 1:
+				pollux.moteurs.tourner(false,1);
+			case 2:
+				pollux.moteurs.tourner(false,1);
+			}
+			pollux.moteurs.l1.startSynchronization();
+			pollux.moteurs.l1.forward();
+			pollux.moteurs.r1.forward();
+			
+			while(pollux.getDistance()>0.2 ) {
+				if( pollux.detectionPallet()) {
+					but++;
+					pollux.moteurs.r1.stop();
+					pollux.moteurs.l1.stop();
+					pollux.moteurs.l1.endSynchronization();
+					switch(i%3) {
+					case 0:
+						pollux.moteurs.tourner(true,1);
+			
+					case 1:
+						pollux.moteurs.tourner(false,1);
+					case 2:
+						pollux.moteurs.tourner(false,1);
+					}
+					pollux.moteurs.l1.startSynchronization();
+					pollux.moteurs.l1.forward();
+					pollux.moteurs.r1.forward();
+					while(pollux.getColor()!="white") {
+						
+					}
+					pollux.moteurs.r1.stop();
+					pollux.moteurs.l1.stop();
+					pollux.moteurs.l1.endSynchronization();
+					break;
+				}
+				
+			}
+			if(but>0) {
+				break;
+			}
+			pollux.moteurs.r1.stop();
+			pollux.moteurs.l1.stop();
+			
+			pollux.moteurs.l1.endSynchronization();
+			courant=Etat.FINPARCOUR;
 			
 
 		case 8:
+			
 
 		case 9:
 		}
