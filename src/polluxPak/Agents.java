@@ -20,8 +20,8 @@ import lejos.utility.Delay;
 
 
 public class Agents {
-	private Capteurs capteurs;
-	private Actionneurs moteurs;
+	Capteurs capteurs;
+	Actionneurs moteurs;
 	public String colorT;
 	public Espace e;
 
@@ -284,6 +284,9 @@ public class Agents {
 		}
 		
 		return dis;
+	}
+	public Espace getEspace() {
+		return e;
 	}
 	public void scanf(int agl) {
 		moteurs.endS();

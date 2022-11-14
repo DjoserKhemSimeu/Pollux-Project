@@ -404,7 +404,7 @@ public class Espace {
 			return false;
 		}
 	}
-	private Zones getZone() {
+	public Zones getZone() {
 		int i=0;
 		while(i<tab.length) {
 			int j=0;
