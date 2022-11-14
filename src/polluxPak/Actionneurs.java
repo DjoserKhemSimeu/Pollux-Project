@@ -107,7 +107,7 @@ public class Actionneurs {
 		return angle;
 	}
 	
-	public void tournerTo(int différence) {
+	public void tournerTo(double différence) {
 		l1.endSynchronization();
 		int i=0;
 		if(différence>0) {
