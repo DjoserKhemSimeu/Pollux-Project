@@ -4,10 +4,10 @@ package polluxPak;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -30,7 +30,7 @@ public class Agents {
 	}
 	public Agents(Port A, Port B, Port D, Port s1, Port s3,Port s4,int x,int y) throws IOException {
 		capteurs= new Capteurs (s1,s3,s4);
-		moteurs= new Actionneurs (A,B,D);
+		moteurs= new Actionneurs (A,B,D, true);
 		e= new Espace(x,y,this);
 		colorT="none";
 
@@ -97,7 +97,10 @@ public class Agents {
 	public String getColor() {
 		return capteurs.getColor();
 	}
-	public void majColor() {
+	public String majColor() {
+		colorT=getColor();
+		return colorT;
+		
 	}
 	public static HashMap<Integer,Double>chercheDis(ArrayList<Double> dist){
 		HashMap<Integer,Double> res=new HashMap<Integer,Double>();
@@ -535,6 +538,10 @@ public class Agents {
 		moteurs.l1.close();
 		moteurs.r1.close();
 
+	}
+	public String MajPos() {
+		e.changementCase();
+		return String.valueOf(e.getNumCase());
 	}
 	public static void main (String[]args) throws IOException {
 		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);

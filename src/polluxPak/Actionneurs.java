@@ -25,10 +25,13 @@ public class Actionneurs {
 	RegulatedMotor r1; // roue droite
 	private RegulatedMotor pince; // pince
 	private double angle; // direction
+	private boolean cote;
+	public static boolean SOUTH=true;
+	public static boolean NORTH=false;
 	
 
 // ce constructeur permet d'initialiser nos attributs d'instance, notamment d'expliciter le lien entre les ports, les attributs et méthodes associées à ceux-ci.
-	public Actionneurs (Port A,Port B,Port D) {
+	public Actionneurs (Port A,Port B,Port D,boolean cote) {
 		l1 = new EV3LargeRegulatedMotor(A);
 		r1= new EV3LargeRegulatedMotor(B);
 		pince= new EV3LargeRegulatedMotor(D);
@@ -38,6 +41,7 @@ public class Actionneurs {
 		l1.synchronizeWith(new RegulatedMotor[] {r1});
 		l1.startSynchronization();
 		angle=0;
+		this.cote=cote;
 	}
 	public Actionneurs() {
 		// TODO Auto-generated constructor stub
@@ -76,7 +80,7 @@ public class Actionneurs {
 		l1.startSynchronization();
 		l1.forward();
 		r1.forward();
-		l1.endSynchronization();
+		
 		
 }
 	// méthode qui synchronise les deux roues afin qu'elles reculent au même rythme, sans limite de temps;
@@ -107,7 +111,7 @@ public class Actionneurs {
 		return angle;
 	}
 	
-	public void tournerTo(int différence) {
+	public void tournerTo(double différence) {
 		l1.endSynchronization();
 		int i=0;
 		if(différence>0) {
@@ -138,7 +142,6 @@ public class Actionneurs {
 		l1.startSynchronization();
 	}
 	public void stop() {
-		l1.startSynchronization();
 		l1.stop();
 		r1.stop();
 
@@ -204,11 +207,17 @@ public class Actionneurs {
 		l1.setSpeed(s);
 		r1.setSpeed(s);
 	}
+	public void recule(int d) {
+		startS();
+		l1.rotate(-d);
+		r1.rotate(-d);
+		endS();
+	}
 	
 
 
 	public static void main (String[]args) {
-		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D);
+		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D,true);
 		//a.tournerTo(90);
 		//Delay.msDelay(10000);
 		int i=0;

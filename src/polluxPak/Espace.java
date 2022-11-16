@@ -52,7 +52,9 @@ public class Espace {
 
 
 		//instanciation des Lignes
-		double inf=Double.POSITIVE_INFINITY;
+		
+	//	double inf=Double.POSITIVE_INFINITY;
+		/*
 		Ligne lr1=new Ligne ("red",new Case [] {case1,case2},new double[] {0.3,0.9},new double[] {2.1,inf});
 		Ligne lr2=new Ligne ("red",new Case [] {case4,case5},new double[] {0.9,2.1},new double[] {0.9,2.1});
 		Ligne lr3=new Ligne ("red",new Case [] {case7,case8},new double[] {2.1,2.7},new double[] {0.3,0.9});
@@ -67,18 +69,19 @@ public class Espace {
 		Ligne lv3=new Ligne ("green",new Case[] {case6,case9},new double[] {1.5,2.0},new double[] {0.0,0.5});
 
 		// instanciation des Intersections
+		
 		Intersections  i1=new Intersections (new Ligne[] {lb1,lb2,lr1,lr2},false,10);
 		Intersections  i2=new Intersections (new Ligne[] {lb2,lb3,ly1,ly2},false,20);
 		Intersections  i3=new Intersections (new Ligne[] {lv1,lv2,lr2,lr3},false,30);
 		Intersections  i4=new Intersections (new Ligne[] {lv2,lv3,ly2,ly3},false,40);
-
+*/
 		//intialisation du tableau espaces avec les objets Zones
 		espaces=new Zones[][] 
-				{{case1,lr1,case2,ly1,case3}
-				,{lb1,  i1,  lb2, i2,  lb3}
-				,{case4,lr2,case5,ly2,case6}
-				,{lv1,  i3,  lv2, i4,  lv3}
-				,{case7,lr3,case8,ly3,case9}};
+				{{case1,case2,case3}
+			
+				,{case4,case5,case6}
+		
+				,{case7,case8,case9}};
 
 	}
 
@@ -317,7 +320,7 @@ public class Espace {
 	 * cette methode utilise un delay afin de determiner si le déplacement est un 
 	 * passage de ligne ou un suivi de ligne
 	 */
-	private boolean changementCase() {
+	public boolean changementCase() {
 
 		// si aucune ligne n'as été passé pas de déplacement
 		if(!pollux.passeLigne()) {
@@ -332,35 +335,9 @@ public class Espace {
 			 * Si le après le delay newCol est toujour la même couleur capté
 			 * il s'agit d'un suivi de ligne sinon un pasage
 			 */
-			if(newCol.equals(pollux.getColor())) {
-				int i=0;
-				Case c= (Case) getZone();
-				while(i<4) {
-					if(c.getBord(i).equals(newCol)) {
-						if(i==0) {
-							tab[getIJ()[0]][getIJ()[1]]=false;
-							tab[getIJ()[0]][getIJ()[1]-1]=true;
-							return true;
-						}
-						if(i==1) {
-							tab[getIJ()[0]][getIJ()[1]]=false;
-							tab[getIJ()[0]][getIJ()[1]+1]=true;
-							return true;
-						}
-						if(i==2) {
-							tab[getIJ()[0]][getIJ()[1]]=false;
-							tab[getIJ()[0]-1][getIJ()[1]]=true;
-							return true;
-						}
-						if(i==3) {
-							tab[getIJ()[0]][getIJ()[1]]=false;
-							tab[getIJ()[0]+1][getIJ()[1]]=true;
-							return true;
-						}
-					}
-					i++;
-				}
-			}else if(pollux.getColor().equals("none")) {
+			while(pollux.getColor()!="none") {
+				
+			}
 				int i=0;
 
 				while(i<tab.length) {
@@ -372,22 +349,22 @@ public class Espace {
 								if(espaces[i][j].getBord(idx).equals(newCol)) {
 									if(idx==0) {
 										tab[i][j]=false;
-										tab[i][j-2]=true;
+										tab[i][j-1]=true;
 										return true;
 									}
 									if(idx==1) {
 										tab[i][j]=false;
-										tab[i][j+2]=true;
+										tab[i][j+1]=true;
 										return true;
 									}
 									if(idx==2) {
 										tab[i][j]=false;
-										tab[i-2][j]=true;
+										tab[i-1][j]=true;
 										return true;
 									}
 									if(idx==3) {
 										tab[i][j]=false;
-										tab[i+2][j]=true;
+										tab[i+1][j]=true;
 										return true;
 									}
 								}
@@ -399,8 +376,8 @@ public class Espace {
 					}
 					i++;
 				}
-				return false;
-			}
+				
+			
 			return false;
 		}
 	}
