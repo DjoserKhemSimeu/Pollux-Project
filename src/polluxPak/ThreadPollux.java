@@ -16,12 +16,12 @@ public class ThreadPollux extends Thread{
 		switch(courant.getNum()){
 		case 1: 
 			pollux.moteurs.avance();
-			if(pollux.detectionPallet())
+			while (pollux.getDistance()>0.1) {
+			if(pollux.detectionPallet()) {
 				pollux.moteurs.stop();
 			pollux.moteurs.tourner(false, 1);
 			pollux.moteurs.avance();
-			while(pollux.getDistance()>0.3) {
-				
+			}
 			}
 			pollux.moteurs.stop();
 			pollux.moteurs.tourner(true,1);
@@ -156,15 +156,11 @@ public class ThreadPollux extends Thread{
 					case 2:
 						pollux.moteurs.tourner(false,1);
 					}
-					pollux.moteurs.l1.startSynchronization();
-					pollux.moteurs.l1.forward();
-					pollux.moteurs.r1.forward();
+					pollux.moteurs.avance();
 					while(pollux.getColor()!="white") {
 						
 					}
-					pollux.moteurs.r1.stop();
-					pollux.moteurs.l1.stop();
-					pollux.moteurs.l1.endSynchronization();
+					pollux.moteurs.stop();
 					break;
 				}
 				
@@ -172,10 +168,7 @@ public class ThreadPollux extends Thread{
 			if(but>0) {
 				break;
 			}
-			pollux.moteurs.r1.stop();
-			pollux.moteurs.l1.stop();
-			
-			pollux.moteurs.l1.endSynchronization();
+			pollux.moteurs.stop();
 			switch(i%3) {
 			case 0:
 				pollux.moteurs.tourner(false,1);
@@ -186,17 +179,12 @@ public class ThreadPollux extends Thread{
 				pollux.moteurs.tourner(true,1);
 			}
 		
-			pollux.moteurs.l1.startSynchronization();
-			pollux.moteurs.l1.forward();
-			pollux.moteurs.r1.forward();
+			pollux.moteurs.avance();
 			
 			while(pollux.getDistance()>1.5) {
 				
 			}
-			pollux.moteurs.r1.stop();
-			pollux.moteurs.l1.stop();
-			
-			pollux.moteurs.l1.endSynchronization();
+			pollux.moteurs.stop();
 			switch(i%3) {
 			case 0:
 				pollux.moteurs.tourner(false,1);
