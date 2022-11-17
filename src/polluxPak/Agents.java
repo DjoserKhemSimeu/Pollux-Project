@@ -42,13 +42,14 @@ public class Agents {
 		return capteurs.getDistance();
 	}
 	public boolean detectionPallet() {
-		//moteurs.avance();
+		moteurs.avance();
 		if(capteurs.getDistance()<0.4) {
 			double dist=capteurs.getDistance();
 			Delay.msDelay(300);
 			if(capteurs.getDistance()>dist)
 			{
 				moteurs.actionPince();
+				moteurs.stop();
 				return true;
 			}else {
 				while(capteurs.getDistance()<0.2) {
@@ -57,6 +58,7 @@ public class Agents {
 				return false;
 
 			}
+
 
 
 		}

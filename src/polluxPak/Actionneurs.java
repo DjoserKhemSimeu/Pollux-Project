@@ -6,6 +6,7 @@ package polluxPak;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
@@ -15,7 +16,7 @@ import lejos.utility.Delay;
 
 public class Actionneurs {
 	public static final int QuartT =200;
-	private static final int DQuartT =200;
+	private static final int DQuartT =370;
 
 	//attributs de direction
 	private static final boolean DROITE=true;
@@ -35,7 +36,7 @@ public class Actionneurs {
 		l1 = new EV3LargeRegulatedMotor(A);
 		r1= new EV3LargeRegulatedMotor(B);
 		pince= new EV3LargeRegulatedMotor(D);
-		pince.setSpeed(1200);
+		pince.setSpeed(2500);
 		//l1.setSpeed(1000);
 		//r1.setSpeed(1000);
 		l1.synchronizeWith(new RegulatedMotor[] {r1});
@@ -80,7 +81,7 @@ public class Actionneurs {
 		l1.startSynchronization();
 		l1.forward();
 		r1.forward();
-		
+		l1.endSynchronization();
 		
 }
 	// méthode qui synchronise les deux roues afin qu'elles reculent au même rythme, sans limite de temps;
@@ -94,10 +95,12 @@ public class Actionneurs {
 	// méthode qui arrête les deux roues puis ouvre les pinces afin que Pollux se libère du palet qu'il a dans ses pinces
 	public void lacherPallet() {
 		stop();
-		pince.rotate(3*QuartT);
-		recule();
-		Delay.msDelay(100);
-		pince.rotate(-3*QuartT);
+		pince.rotate(6*QuartT);
+		startS();
+		l1.rotate(-200,true);
+		r1.rotate(-200,true);
+		endS();
+		pince.rotate(-6*QuartT);
 		r1.stop();
 		tournerR(true,2);	
 	}
@@ -142,14 +145,16 @@ public class Actionneurs {
 		l1.startSynchronization();
 	}
 	public void stop() {
+		startS();
 		l1.stop();
 		r1.stop();
+		endS();
+	
 
-		l1.endSynchronization();
 	}
 	public void actionPince() {
-		pince.rotate(3*QuartT);
-		pince.rotate(-3*QuartT);
+		pince.rotate(6*QuartT);
+		pince.rotate(-6*QuartT);
 	}
 	public void addAngle(int deg,boolean dir) {
 		angle%=360;
@@ -219,13 +224,15 @@ public class Actionneurs {
 	public static void main (String[]args) {
 		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D,true);
 		//a.tournerTo(90);
-		//Delay.msDelay(10000);
-		int i=0;
-		while (i<90) {
-			a.tournerScan(false);
-			i++;
+		while(!Button.ESCAPE.isDown()) {
+			int i=0;
+			if(Button.ENTER.isDown()) {
+				a.actionPince();
+			}
 		}
-		Delay.msDelay(5000);
+	
+		
+		
 		
 	
 		

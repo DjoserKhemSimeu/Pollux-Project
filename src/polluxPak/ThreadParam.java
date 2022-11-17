@@ -14,7 +14,6 @@ public class ThreadParam extends Thread {
 		this.pollux=pollux;
 	}
 	public void run() {
-		while(!Button.ENTER.isDown()) {
 			String colorT=pollux.majColor();
 			
 			LCD.clear(3);
@@ -27,7 +26,7 @@ public class ThreadParam extends Thread {
 			LCD.drawString("angle : "+pollux.getAngle(), 0,6);
 	
 
-		}
+		
 	}
 	
 

@@ -1,5 +1,7 @@
 package polluxPak;
 
+import lejos.utility.Delay;
+
 public class ThreadPollux extends Thread{
 	private Agents pollux;
 	private Etat courant;
@@ -10,21 +12,30 @@ public class ThreadPollux extends Thread{
 	public ThreadPollux( Agents a){
 		pollux = a; 
 		courant = Etat.P0;
+		pollux.moteurs.speed(450);
 	}
 
 	public void run(){
 		switch(courant.getNum()){
-		case 1: 
+		case 1: System.out.println("1");
 			pollux.moteurs.avance();
-			while (pollux.getDistance()>0.1) {
-			if(pollux.detectionPallet()) {
-				pollux.moteurs.stop();
-			pollux.moteurs.tourner(false, 1);
-			pollux.moteurs.avance();
+		
+			
+			
+			while (!pollux.detectionPallet()) {
+		
 			}
+			
+			pollux.moteurs.stop();
+			pollux.moteurs.tourner(false, 1);
+			Delay.msDelay(500);
+			pollux.moteurs.avance();
+			while(pollux.getDistance()>0.15) {
+				
 			}
 			pollux.moteurs.stop();
 			pollux.moteurs.tourner(true,1);
+			Delay.msDelay(500);
 			pollux.moteurs.avance();
 			while(pollux.capteurs.getColor()!= "white"){
 			}
@@ -34,29 +45,35 @@ public class ThreadPollux extends Thread{
 
 
 		case 2:
-			pollux.moteurs.recule(100);
-			pollux.moteurs.tournerR(true,2);
-			pollux.moteurs.avance();
+			System.out.println("2");
+			/*pollux.moteurs.recule();
+			Delay.msDelay(500);
+			pollux.moteurs.stop();
+			pollux.moteurs.tournerR(true,1);
+			Delay.msDelay(1000);
+			*/pollux.moteurs.avance();
 			while(pollux.getColor()=="none") {
+				System.out.print ("f");
 			}
+			Delay.msDelay(500);
 			pollux.moteurs.stop();
 			pollux.moteurs.tourner(false,1);
+			Delay.msDelay(500);
 			pollux.moteurs.avance();
-			while(pollux.getDistance()>0.2) {
-				if(pollux.detectionPallet()) {
-					pollux.moteurs.actionPince();
-					break;
-				}
+			while(!pollux.detectionPallet()) {
+				
+				
 				
 			}
 			pollux.moteurs.stop();
 			
 			pollux.moteurs.tourner(false,1);
+			Delay.msDelay(500);
 			pollux.moteurs.avance();
 			while(pollux.getColor()!="white") {
 			}
 			pollux.moteurs.stop();
-			pollux.moteurs.actionPince();
+			pollux.moteurs.lacherPallet();
 			
 			courant=Etat.BUT;
 			
@@ -65,18 +82,19 @@ public class ThreadPollux extends Thread{
 
 
 		case 3:
-			pollux.moteurs.recule(100);
-			pollux.moteurs.tournerR(true,2);
+			System.out.println("3");
 			
 			if(pollux.scan()==-1) {
 				courant=Etat.PALET0;
 			}else {
 				courant=Etat.PALET_A;
 			}
+			pollux.moteurs.speed(500);
 			
 			
 
 		case 4:
+			System.out.println("4");
 			pollux.moteurs.avance();
 			int but4=0;
 			while(pollux.getDistance()>0.15)
@@ -111,6 +129,7 @@ public class ThreadPollux extends Thread{
 			
 
 		case 5:
+			System.out.println("5");
 			pollux.moteurs.tourner(false,((double)pollux.moteurs.getAngle()-180)/360);
 			pollux.moteurs.avance();
 			while (pollux.getDistance()>1.5) {
@@ -122,10 +141,11 @@ public class ThreadPollux extends Thread{
 
 
 		case 6:
+			System.out.println("6");
 			pollux.scanf(360);
 
 		case 7:
-			
+			System.out.println("7");
 			int but=0;
 			pollux.moteurs.tournerR(true,2);
 			pollux.moteurs.avance();

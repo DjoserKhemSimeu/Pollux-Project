@@ -15,7 +15,7 @@ public class Competition {
 		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);
 		ThreadParam param=new ThreadParam(robot);
 		ThreadPollux pollux=new ThreadPollux(robot);
-		param.start();
+
 		pollux.start();
 		
 	
