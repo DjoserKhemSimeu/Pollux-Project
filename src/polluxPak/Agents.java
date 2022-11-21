@@ -2,12 +2,21 @@ package polluxPak;
 
 
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,10 +38,12 @@ public class Agents {
 		// TODO Auto-generated constructor stub
 	}
 	public Agents(Port A, Port B, Port D, Port s1, Port s3,Port s4,int x,int y) throws IOException {
+		// 
 		capteurs= new Capteurs (s1,s3,s4);
 		moteurs= new Actionneurs (A,B,D, true);
 		e= new Espace(x,y,this);
 		colorT="none";
+		moteurs.speed(550);
 
 	}
 	public double getAngle(){
@@ -48,11 +59,14 @@ public class Agents {
 			Delay.msDelay(300);
 			if(capteurs.getDistance()>dist)
 			{
+				moteurs.speed(450);
 				moteurs.actionPince();
 				moteurs.stop();
+				moteurs.speed(550);
 				return true;
 			}else {
 				while(capteurs.getDistance()<0.2) {
+					
 					moteurs.tourner(true,1);
 				}
 				return false;
@@ -102,7 +116,7 @@ public class Agents {
 	public String majColor() {
 		colorT=getColor();
 		return colorT;
-		
+
 	}
 	public static HashMap<Integer,Double>chercheDis(ArrayList<Double> dist){
 		HashMap<Integer,Double> res=new HashMap<Integer,Double>();
@@ -128,60 +142,8 @@ public class Agents {
 		return sum/d.length;
 	}
 
-	private ArrayList<Double> tourScan(int deg, boolean dir){
-		ArrayList<Double>distances=new ArrayList<Double>();
-		moteurs.l1.endSynchronization();
-		moteurs.l1.setSpeed(30);
-		moteurs.r1.setSpeed(30);
-
-		moteurs.l1.rotate((deg/360)*Actionneurs.QuartT,true);
-		moteurs.r1.rotate(-(deg/360)*Actionneurs.QuartT,true);
-
-
-
-		while(moteurs.isMoving()) {
-			double []moy=new double[10];
-			for(int i=0;i<moy.length;i++) {
-				double f=getDistance();
-				if(f!=Double.POSITIVE_INFINITY) {
-					moy[i]= f;
-
-				}else {
-					moy[i]=2.5;
-				}
-			}
-			double m=tabMoy(moy);
-			int cpt=0;
-			ArrayList<Double> rep=new ArrayList<Double>();
-			while (cpt<moy.length) {
-				if(Math.abs(moy[cpt]-m)<0.1) {
-					rep.add(moy[cpt]);
-				}
-				cpt++;
-			}
-			double[] cast=new double[rep.size()];
-			int i=0;
-			for (Double d: rep) {
-				cast[i]=d;
-				i++;
-			}
-
-
-
-			System.out.println(tabMoy(cast));
-
-			distances.add(tabMoy(cast));
-
-
-
-
-		}
-		moteurs.addAngle(deg,true);
-		moteurs.l1.startSynchronization();
-		return distances;
-
-	}
-	public double moyArrays(ArrayList<Double>t) {
+	
+	public double moyArrays(Collection<Double>t) {
 		double res=0;
 		for(Double d:t) {
 			res+=d;
@@ -277,7 +239,7 @@ public class Agents {
 			for(Integer j:agl2) {
 				if(Math.abs(i-j)<10&&i!=j && !memo.contains(j)) {
 					memo.add(i);
-				
+
 					memo.add(j);
 					bin.add(j);
 					System.out.println("oui");
@@ -287,7 +249,7 @@ public class Agents {
 		for(Integer iv:bin) {
 			dis.remove(iv);
 		}
-		
+
 		return dis;
 	}
 	public Espace getEspace() {
@@ -325,11 +287,11 @@ public class Agents {
 				cast=new double[] {m};
 			}else {
 				cast=new double[moy.length];
-			int i=0;
-			for (Double d: rep) {
-				cast[i]=d;
-				i++;
-			}
+				int i=0;
+				for (Double d: rep) {
+					cast[i]=d;
+					i++;
+				}
 			}
 
 
@@ -356,153 +318,164 @@ public class Agents {
 		}
 		dict=cleanDis(dict);
 		System.out.println(dict.keySet());
-		
+
 	}
 
+	/*Méthode scan(int n) qui prend en parametre un nombre de quart de tour a effectuer
+	 * 
+	 * Thechnique utiliser: prendre un echantillon de 5 valeurs ,
+	 * l'échantillon est une fenetre glissante, pour chaque nouvelle distance la plus ancienne est suppr
+	 * et la nouvelle est stocker, calculer max-min de l'échantillon
+	 * stocker cette valeurs dans une liste res. Parcourir la liste res afin de trouver des valeurs > delta
+	 * stocker ces valeur dans un dictionnaire de relation indice dans la liste-distance percue
+	 * selectioner dans le dictionnaire la indice dans la list a la distance la plus faible et la retourner 
+	 * 
+	 * Problème rencontrer:  lorsque aucun pallet est sur le terrain il detecte quand meme une discontinuitée
+	 * et lka discontinuitée percu lorsrqu'il y'a un palet n'es pas précise
+	 */
 
 
 
 
 
 
+	public double scan(int n) throws IOException {
 
-	public int scan() {
-
+		// création du tableau des distances qui stocks les distances percues
 		ArrayList<Double>distances=new ArrayList<Double>();
-		moteurs.l1.endSynchronization();
-		moteurs.l1.setSpeed(30);
-		moteurs.r1.setSpeed(30);
+		// initilisation des moteurs afin debuter la rotation 
+		moteurs.endS();
+		moteurs.l1.setSpeed(100);
+		moteurs.r1.setSpeed(100);
 
-		moteurs.l1.rotate(Actionneurs.QuartT,true);
-		moteurs.r1.rotate(-Actionneurs.QuartT,true);
+		// debut de la rotation en faisant appel a Actionneurs.QuartT(90°)
+		moteurs.l1.rotate(n*Actionneurs.QuartT,true);
+		moteurs.r1.rotate(-n*Actionneurs.QuartT,true);
+
+		// Création d'une ListeTriee qui contiendra l'échantillon sous forme triee
+		ListeTriee l=new ListeTriee();
+
+		//Creation de la fentre glissante sur forme d'une linkedList
+		LinkedList<Double>fenetre=new LinkedList<Double>();
 
 
+		//intialization de des deux liste avec les 5 premiere valeur
+		for(int compt=0;compt<2;compt++) {
+			l.add(getDistance());
+			fenetre.addLast(getDistance());
+		}
 
+		// Création de la list qui vas contenir les valeur max-min
+		LinkedList<Double> rep=new LinkedList<Double>();
+		rep.addLast(l.getLast()-l.getFirst());
+		System.out.println(rep.size() +" = "+(l.getLast()-l.getFirst()));
 
+		// ajout de la premiere distance percue a distances
+		distances.add(getDistance());
+
+		//netoyage de la liste triée et suppression de la premiere distance percue
+		l.clear();
+		fenetre.removeFirst();
+
+		// boucle de mouvement qui s'arrete à la fin de la rotation de pollux
 		while(moteurs.isMoving()) {
-			double []moy=new double[10];
-			for(int i=0;i<moy.length;i++) {
-				double f=getDistance();
-				if(f!=Double.POSITIVE_INFINITY) {
-					moy[i]= f;
+			
 
-				}else {
-					moy[i]=2.5;
-				}
-			}
-			double m=tabMoy(moy);
-			int cpt=0;
-			ArrayList<Double> rep=new ArrayList<Double>();
-			while (cpt<moy.length) {
-				if(Math.abs(moy[cpt]-m)<0.1) {
-					rep.add(moy[cpt]);
-				}
-				cpt++;
-			}
-			double[] cast=new double[rep.size()];
-			int i=0;
-			for (Double d: rep) {
-				cast[i]=d;
-				i++;
+
+			double f=getDistance();
+
+			//prise en charge des distance infini = 2.5
+			if(f!=Double.POSITIVE_INFINITY) {
+				fenetre.addLast(f);
+
+			}else {
+				fenetre.addLast(2.5);
 			}
 
+			// ajout de tout les element de fentre dans l pour les trier
+			l.addAll(fenetre);
 
 
-			System.out.println(tabMoy(cast));
-
-			distances.add(tabMoy(cast));
-
-
-
+			// ajout de min - max dans rep et suppression du premier element de fenetre
+			rep.addLast(l.getLast()-l.getFirst());
+			System.out.println(rep.size() +" = "+(l.getLast()-l.getFirst()));
+			distances.add(fenetre.getLast());
+			l.clear();
+			fenetre.removeFirst();
+			
 
 		}
-		moteurs.addAngle(90,true);
-		moteurs.l1.startSynchronization();
-
-		double size=distances.size();
-
-		double delta=0.15;
-		ArrayList<Double> distDis=new ArrayList<Double>();
-		ArrayList <Integer>angleDis=new ArrayList<Integer>();
-
-		int i=1;
-
-		double prec= distances.get(0);
-		while(i<size) {
-			double now=distances.get(i);
-
-
-
-			if(Math.abs(prec-now)>delta) {
-				System.out.println(size);
-				System.out.println("###########################");
-				int goal=(int)(i*90.0/size);
-				System.out.println(i);
-				distDis.add(now);
-				angleDis.add(goal);
+		
+		// Creation du dictionnaire de dis continuite (relation indice dans la liste-distance percue)
+		HashMap <Integer,Double> dis= new HashMap<Integer,Double>();
+		ListIterator<Double> it=rep.listIterator();
+		int i=0;
+		Double c;
+		double delta=0.2;
+		while (i<10) {
+			it.next();
+			i++;
+		}
+		while(it.hasNext()) {
+			c=it.next();
+			if(c>delta) {
+				int i2=i;
+				System.out.print(i+"*");
+				boolean pass=false;
+				while (it.hasNext()&&pass==false) {
+					c=it.next();
+					if(c>delta) {
+						dis.put((i+i2)/2,distances.get(i));
+						System.out.print(i);
+						pass=true;
+					}
+					i++;
+				}
+				System.out.println();
 			}
-			prec=now;
 			i++;
 		}
 
 
-		int compt=0;
-		ArrayList<Integer> res=new ArrayList<Integer>();
-		while(compt+1<angleDis.size()) {
-			res.add((angleDis.get(compt)+angleDis.get(compt+1))/2);
-			compt=compt+2;
-
-		}
-
-		for(Integer in: res) {
-			System.out.print(in+" ");
-		}
-
-
-		if(distDis.size()>0) {
-			double min= Double.MAX_VALUE;
-			int idx=0;
-			for(Double d: distDis ) {
-				if(d<min) {
-					min=d;
-					idx=distDis.indexOf(d);
-				}
-
-
-
-
+		moteurs.addAngle(n*90,true);
+		double agl=0;
+		double min=Double.MAX_VALUE;
+		for(Integer k: dis.keySet()) {
+			if(min>dis.get(k)) {
+				agl=k;
+				min=dis.get(k);
+				System.out.print(rep.get(k)+" "+"("+k+") ");
 			}
-			double angle= angleDis.get(idx);
-			int diff=(int)(moteurs.getAngle()-angle);
-			/*moteurs.l1.backward();
-			moteurs.r1.forward();
-			int rep=distances.size()-1;
-			while(moteurs.l1.isMoving()) {
-				if (rep==angle) {
-					moteurs.l1.stop();
-					moteurs.r1.stop();
-				}
-			}*/
-			return diff;
 		}
+		agl=(agl*(n*90))/rep.size();
 
+		System.out.println("=");
+		System.out.println(dis.keySet());
+		System.out.println(agl);
+		double diff= getAngle()-agl;
+		
+			moteurs.tourner(false,diff/90);
+			Delay.msDelay(5000);
+			moteurs.speed(550);
+			moteurs.startS();
+			moteurs.avance();
+			while(!detectionPallet()) {
+				
+			}
+			moteurs.stop();
+			moteurs.endS();
+		
+		return agl;
 
-		return -1;
-		//ArrayList<Double> discontinuitées	=new ArrayList<Double>();
 
 
 
 	}
-	public void chercheAngle() {
-		int diff=scan();
-		if(diff>=0) {
-			int i=0;
-			while(i<diff) {
-				moteurs.tournerScan(false);
-				i++;
-			}
-			Delay.msDelay(5000);
-		}
+
+	public void chercheAngle(double n) throws IOException {
+		double diff= getAngle()-n;
+
+
 	}
 	public void action() {
 
@@ -547,10 +520,9 @@ public class Agents {
 	}
 	public static void main (String[]args) throws IOException {
 		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);
-		robot.scanf(180);
-		while(!Button.ENTER.isDown()) {
+		robot.scan(1);
+		Delay.msDelay(10000);
 
-		}
 
 
 

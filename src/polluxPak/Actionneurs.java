@@ -15,8 +15,8 @@ import lejos.utility.Delay;
 
 
 public class Actionneurs {
-	public static final int QuartT =200;
-	private static final int DQuartT =370;
+	public static final int QuartT =205;
+	private static final int DQuartT =397;
 
 	//attributs de direction
 	private static final boolean DROITE=true;
@@ -36,9 +36,8 @@ public class Actionneurs {
 		l1 = new EV3LargeRegulatedMotor(A);
 		r1= new EV3LargeRegulatedMotor(B);
 		pince= new EV3LargeRegulatedMotor(D);
-		pince.setSpeed(2500);
-		//l1.setSpeed(1000);
-		//r1.setSpeed(1000);
+		pince.setSpeed(3000);
+		speed(550);
 		l1.synchronizeWith(new RegulatedMotor[] {r1});
 		l1.startSynchronization();
 		angle=0;
@@ -218,18 +217,20 @@ public class Actionneurs {
 		r1.rotate(-d);
 		endS();
 	}
+	public void flt() {
+		startS();
+		l1.flt();
+		r1.flt();
+		endS();
+	}
 	
 
 
 	public static void main (String[]args) {
 		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D,true);
 		//a.tournerTo(90);
-		while(!Button.ESCAPE.isDown()) {
-			int i=0;
-			if(Button.ENTER.isDown()) {
-				a.actionPince();
-			}
-		}
+		a.tournerR(true,1);
+		Delay.msDelay(4000);
 	
 		
 		

@@ -16,7 +16,7 @@ public class Competition {
 		ThreadParam param=new ThreadParam(robot);
 		ThreadPollux pollux=new ThreadPollux(robot);
 
-		pollux.start();
+		pollux.run();
 		
 	
 			

@@ -1,8 +1,10 @@
 package polluxPak;
 
+import java.io.IOException;
+
 import lejos.utility.Delay;
 
-public class ThreadPollux extends Thread{
+public class ThreadPollux {
 	private Agents pollux;
 	private Etat courant;
 
@@ -84,12 +86,15 @@ public class ThreadPollux extends Thread{
 		case 3:
 			System.out.println("3");
 			
-			if(pollux.scan()==-1) {
-				courant=Etat.PALET0;
-			}else {
+			try {
+				pollux.scan(1);
 				courant=Etat.PALET_A;
+				Delay.msDelay(10000);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			pollux.moteurs.speed(500);
+			
 			
 			
 
@@ -130,7 +135,7 @@ public class ThreadPollux extends Thread{
 
 		case 5:
 			System.out.println("5");
-			pollux.moteurs.tourner(false,((double)pollux.moteurs.getAngle()-180)/360);
+			//pollux.moteurs.tourner(false,((double)pollux.moteurs.getAngle()-180)/360);
 			pollux.moteurs.avance();
 			while (pollux.getDistance()>1.5) {
 				
@@ -142,7 +147,12 @@ public class ThreadPollux extends Thread{
 
 		case 6:
 			System.out.println("6");
-			pollux.scanf(360);
+			try {
+				pollux.scan(4);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		case 7:
 			System.out.println("7");
