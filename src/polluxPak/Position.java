@@ -1,4 +1,4 @@
-package polluxPax
+package polluxPak;
 
 public class Position {
 	private int x; 
@@ -25,12 +25,24 @@ public class Position {
 	}
 	
 	public int modulo() {
-		return Math.sqrt(x*x+y*y);
+		return (int) Math.sqrt(x*x+y*y);
 	}
 	
 	public int arg() {
-		return Math.atan(y/x);
+		return (int) Math.atan(y/x);
 	}
 	
-	
+	public String toString() {
+		return x + ";" + y;
+	}
+	public int getDistance(Position pos) {
+		int distx = x-pos.x;
+		int disty = y-pos.y;
+		return (int) Math.sqrt(distx*distx + disty*disty);
+	}
+	public boolean equals(Position pos) {
+		if(this.x==pos.x && this.y==pos.y)
+			return true;
+		return false;
+	}
 }
