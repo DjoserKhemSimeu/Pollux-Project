@@ -66,7 +66,7 @@ public class Agents {
 				return true;
 			}else {
 				while(capteurs.getDistance()<0.2) {
-					
+
 					moteurs.tourner(true,1);
 				}
 				return false;
@@ -142,7 +142,7 @@ public class Agents {
 		return sum/d.length;
 	}
 
-	
+
 	public double moyArrays(Collection<Double>t) {
 		double res=0;
 		for(Double d:t) {
@@ -339,7 +339,7 @@ public class Agents {
 
 
 
-	public double scan(int n) throws IOException {
+	public double scan(int n, boolean dir) throws IOException {
 
 		// création du tableau des distances qui stocks les distances percues
 		ArrayList<Double>distances=new ArrayList<Double>();
@@ -349,8 +349,13 @@ public class Agents {
 		moteurs.r1.setSpeed(100);
 
 		// debut de la rotation en faisant appel a Actionneurs.QuartT(90°)
+		if(dir) {
 		moteurs.l1.rotate(n*Actionneurs.QuartT,true);
 		moteurs.r1.rotate(-n*Actionneurs.QuartT,true);
+		}else {
+			moteurs.l1.rotate(-n*Actionneurs.QuartT,true);
+			moteurs.r1.rotate(n*Actionneurs.QuartT,true);
+		}
 
 		// Création d'une ListeTriee qui contiendra l'échantillon sous forme triee
 		ListeTriee l=new ListeTriee();
@@ -379,7 +384,7 @@ public class Agents {
 
 		// boucle de mouvement qui s'arrete à la fin de la rotation de pollux
 		while(moteurs.isMoving()) {
-			
+
 
 
 			double f=getDistance();
@@ -402,10 +407,10 @@ public class Agents {
 			distances.add(fenetre.getLast());
 			l.clear();
 			fenetre.removeFirst();
-			
+
 
 		}
-		
+
 		// Creation du dictionnaire de dis continuite (relation indice dans la liste-distance percue)
 		HashMap <Integer,Double> dis= new HashMap<Integer,Double>();
 		ListIterator<Double> it=rep.listIterator();
@@ -448,23 +453,35 @@ public class Agents {
 			}
 		}
 		agl=(agl*(n*90))/rep.size();
+		if(agl==0) {
+			return -1;
+		}
 
 		System.out.println("=");
 		System.out.println(dis.keySet());
 		System.out.println(agl);
-		double diff= getAngle()-agl;
+		double diff= n*90-agl;
+
+		moteurs.tourner(false,diff/90);
+		Delay.msDelay(5000);
+		moteurs.speed(550);
+		moteurs.startS();
+		moteurs.avance();
+		while(!detectionPallet()) {
+
+		}
 		
-			moteurs.tourner(false,diff/90);
-			Delay.msDelay(5000);
-			moteurs.speed(550);
-			moteurs.startS();
-			moteurs.avance();
-			while(!detectionPallet()) {
-				
-			}
-			moteurs.stop();
-			moteurs.endS();
-		
+		moteurs.stop();
+		moteurs.endS();
+		moteurs.tourner(true,1+(diff/90));
+		Delay.msDelay(3000);
+		moteurs.startS();
+		moteurs.avance();
+		while(capteurs.getColor()!= "white"){
+		}
+		moteurs.stop();
+		moteurs.lacherPallet(2);
+
 		return agl;
 
 
@@ -520,7 +537,7 @@ public class Agents {
 	}
 	public static void main (String[]args) throws IOException {
 		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);
-		robot.scan(1);
+		robot.scan(1,true);
 		Delay.msDelay(10000);
 
 

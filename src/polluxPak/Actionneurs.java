@@ -24,7 +24,7 @@ public class Actionneurs {
 
 	RegulatedMotor l1; // roue gauche
 	RegulatedMotor r1; // roue droite
-	private RegulatedMotor pince; // pince
+	RegulatedMotor pince; // pince
 	private double angle; // direction
 	private boolean cote;
 	public static boolean SOUTH=true;
@@ -92,7 +92,7 @@ public class Actionneurs {
 	}
 	
 	// méthode qui arrête les deux roues puis ouvre les pinces afin que Pollux se libère du palet qu'il a dans ses pinces
-	public void lacherPallet() {
+	public void lacherPallet(int d) {
 		stop();
 		pince.rotate(6*QuartT);
 		startS();
@@ -101,7 +101,8 @@ public class Actionneurs {
 		endS();
 		pince.rotate(-6*QuartT);
 		r1.stop();
-		tournerR(true,2);	
+		tournerR(true,d);
+		addAngle(d*90,true);
 	}
 	
 	// return true si un des moteurs(roue) est en mouvement
@@ -156,7 +157,7 @@ public class Actionneurs {
 		pince.rotate(-6*QuartT);
 	}
 	public void addAngle(int deg,boolean dir) {
-		angle%=360;
+		
 		if(dir==DROITE) {
 			angle= angle +deg;
 		}else {
@@ -169,6 +170,7 @@ public class Actionneurs {
 			angle= angle -deg;
 			}
 		}
+		angle%=360;
 	}
 	public void tourner(boolean dir,double nbQuartT) {
 		l1.endSynchronization();
@@ -189,15 +191,13 @@ public class Actionneurs {
 		if(dir==DROITE) {
 			r1.stop();
 			l1.rotate(-DQuartT*nbQuartT);
-			angle= angle +QuartT*nbQuartT;
+			addAngle(nbQuartT*90,DROITE);
+
 		}else if(dir==GAUCHE) {
 			l1.stop();
 			r1.rotate(-DQuartT*nbQuartT);
-			if(angle==0) {
-				angle=360-90*nbQuartT;
-			}else {
-			angle= angle -90*nbQuartT;
-			}
+			addAngle(nbQuartT*90,GAUCHE);
+			
 		}
 		l1.startSynchronization();
 	}
@@ -229,8 +229,10 @@ public class Actionneurs {
 	public static void main (String[]args) {
 		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D,true);
 		//a.tournerTo(90);
-		a.tournerR(true,1);
+		a.tournerR(true,5);
+		System.out.print(a.getAngle());
 		Delay.msDelay(4000);
+		
 	
 		
 		
