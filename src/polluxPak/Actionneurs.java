@@ -15,7 +15,7 @@ import lejos.utility.Delay;
 
 
 public class Actionneurs {
-	public static final int QuartT =205;
+	public static final int QuartT =200;
 	private static final int DQuartT =397;
 
 	//attributs de direction
@@ -37,7 +37,7 @@ public class Actionneurs {
 		r1= new EV3LargeRegulatedMotor(B);
 		pince= new EV3LargeRegulatedMotor(D);
 		pince.setSpeed(3000);
-		speed(550);
+		speed(650);
 		l1.synchronizeWith(new RegulatedMotor[] {r1});
 		l1.startSynchronization();
 		angle=0;
@@ -96,13 +96,13 @@ public class Actionneurs {
 		stop();
 		pince.rotate(6*QuartT);
 		startS();
-		l1.rotate(-200,true);
-		r1.rotate(-200,true);
+		l1.rotate(-100,true);
+		r1.rotate(-100,true);
 		endS();
 		pince.rotate(-6*QuartT);
 		r1.stop();
-		tournerR(true,d);
-		addAngle(d*90,true);
+		tournerR(false,d);
+		addAngle(d*90,false);
 	}
 	
 	// return true si un des moteurs(roue) est en mouvement
@@ -153,11 +153,12 @@ public class Actionneurs {
 
 	}
 	public void actionPince() {
+		pince.setSpeed(1400);
 		pince.rotate(6*QuartT);
 		pince.rotate(-6*QuartT);
 	}
 	public void addAngle(int deg,boolean dir) {
-		
+
 		if(dir==DROITE) {
 			angle= angle +deg;
 		}else {
@@ -229,7 +230,7 @@ public class Actionneurs {
 	public static void main (String[]args) {
 		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D,true);
 		//a.tournerTo(90);
-		a.tournerR(true,5);
+		a.pince.rotate(-720);
 		System.out.print(a.getAngle());
 		Delay.msDelay(4000);
 		

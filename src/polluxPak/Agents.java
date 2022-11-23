@@ -59,10 +59,10 @@ public class Agents {
 			Delay.msDelay(300);
 			if(capteurs.getDistance()>dist)
 			{
-				moteurs.speed(450);
+				moteurs.speed(350);
 				moteurs.actionPince();
 				moteurs.stop();
-				moteurs.speed(550);
+				moteurs.speed(650);
 				return true;
 			}else {
 				while(capteurs.getDistance()<0.2) {
@@ -461,10 +461,15 @@ public class Agents {
 		System.out.println(dis.keySet());
 		System.out.println(agl);
 		double diff= n*90-agl;
+		
+		if(dir) {
 
 		moteurs.tourner(false,diff/90);
+		}else {
+			moteurs.tourner(true,diff/90);
+		}
 		Delay.msDelay(5000);
-		moteurs.speed(550);
+		moteurs.speed(650);
 		moteurs.startS();
 		moteurs.avance();
 		while(!detectionPallet()) {
@@ -473,14 +478,18 @@ public class Agents {
 		
 		moteurs.stop();
 		moteurs.endS();
+		if(dir) {
 		moteurs.tourner(true,1+(diff/90));
-		Delay.msDelay(3000);
+		}else {
+			moteurs.tourner(false,1+(diff/90));
+		}
+		Delay.msDelay(5000);
 		moteurs.startS();
 		moteurs.avance();
 		while(capteurs.getColor()!= "white"){
 		}
 		moteurs.stop();
-		moteurs.lacherPallet(2);
+		moteurs.lacherPallet(1);
 
 		return agl;
 

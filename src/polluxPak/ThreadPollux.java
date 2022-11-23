@@ -18,15 +18,28 @@ public class ThreadPollux {
 		pollux.moteurs.pince.setSpeed(2000);
 		pollux.moteurs.speed(550);
 	}
+	
+	/*
+	 * Methode run qui vas représenter le diagramme d'état de pollux
+	 */
 
 	public void run(){
 		while(!Button.ENTER.isDown()) {
+			
+		
+			 // representation du diagramme par un switch case
 			switch(courant.getNum()){
+	
+			
+			// Etat initiale P0
 			case 1: System.out.println("1");
+			/*
+			 * Il avance jsqua dtecter un pallet, tourner vers la gauche 
+			 * jusqua etre a 15 cm du mur, tourner a droite et avancer
+			 * jusqua la ligne blanche et se retourner
+			 */
+			
 			pollux.moteurs.avance();
-
-
-
 			while (!pollux.detectionPallet()) {
 
 			}
@@ -35,7 +48,7 @@ public class ThreadPollux {
 			pollux.moteurs.tourner(false, 1);
 			Delay.msDelay(500);
 			pollux.moteurs.avance();
-			while(pollux.getDistance()>0.15) {
+			while(pollux.getDistance()>0.2) {
 
 			}
 			pollux.moteurs.stop();
@@ -45,50 +58,53 @@ public class ThreadPollux {
 			while(pollux.capteurs.getColor()!= "white"){
 			}
 			pollux.moteurs.stop();
-			pollux.moteurs.lacherPallet(2);
-			courant = Etat.B1;
-
-
-			case 2:
-				System.out.println("2");
-				/*pollux.moteurs.recule();
-			Delay.msDelay(500);
+			pollux.moteurs.lacherPallet(1);
+			pollux.moteurs.avance();
+			while(pollux.getColor()=="none") {
+				
+			}
+			Delay.msDelay(300);
 			pollux.moteurs.stop();
-			pollux.moteurs.tournerR(true,1);
-			Delay.msDelay(1000);
-				 */pollux.moteurs.avance();
-				 while(pollux.getColor()=="none") {
-					 System.out.print ("f");
+			pollux.moteurs.tourner(true,1);
+			Delay.msDelay(2000);
+			courant = Etat.B1;
+			
+
+			
+			
+
+			// Etat Premier but mis B1
+			case 2:
+				
+				/* Pollux vas avancer en detectant les pallet jusqua atteindre la premiere ligne de 
+				 *couleur pour tourner a gauche et attraper le premier pallet qui'il detecte 
+				 *pour le deposer dans l'enbut et se tourner a 90°
+				 */
+				System.out.println("2");
+				 int goal=0;
+				 while(pollux.getColor()!="blue"){
+					if(pollux.detectionPallet()) {
+						goal++;
+						pollux.moteurs.tourner(true,2);
+					 }
+					Delay.msDelay(500);
 				 }
-				 Delay.msDelay(500);
-				 pollux.moteurs.stop();
-				 pollux.moteurs.tourner(false,1);
+				 if(goal==0) {
+					 Delay.msDelay(300);
+					 pollux.moteurs.stop();
+					 pollux.moteurs.tourner(false,1);
+					 Delay.msDelay(500);
+					 pollux.moteurs.avance();
+					
+					 pollux.moteurs.stop();
+
+					 pollux.moteurs.tourner(false,1);
+				 }
 				 Delay.msDelay(500);
 				 pollux.moteurs.avance();
-				 while(!pollux.detectionPallet()) {
-
-
-
+				 while(pollux.capteurs.getColor()!="white") {
 				 }
 				 pollux.moteurs.stop();
-
-				 pollux.moteurs.tourner(false,1);
-				 Delay.msDelay(500);
-				 pollux.moteurs.avance();
-				 while(pollux.getColor()!="white") {
-				 }
-
-				 pollux.moteurs.stop();
-				 pollux.moteurs.pince.rotate(6*pollux.moteurs.QuartT);
-				 pollux.moteurs.startS();
-				 pollux.moteurs.l1.rotate(-200,true);
-				 pollux.moteurs.r1.rotate(-200,true);
-				 pollux.moteurs.endS();
-				 pollux.moteurs.	pince.rotate(-6*pollux.moteurs.QuartT);
-				 pollux.moteurs.r1.stop();
-				 pollux.moteurs.tournerR(true,1);
-				 pollux.moteurs.addAngle(90,true);
-
 				 pollux.moteurs.lacherPallet(1);
 
 				 courant=Etat.BUT;
@@ -96,8 +112,18 @@ public class ThreadPollux {
 
 
 
+				 
 
+				 //Etat but ou pollux vas utiliser le scan
 			case 3:
+				/*
+				 * pollux vas capter la distance du mur en face de lui ainsi il saura
+				 * ou il se trouve , en fonction de sa position un scan est lancer:
+				 * si il est a droite du terrain il vas lancer un scan de 90 vers la droite
+				 * si il est a gauche du terrain il vas d'abord faire un 90° a droite pour ensuite faire 
+				 * un sacn de 90° vers la droite
+				 * si il est au milieux il fait un scan de 180° vers la droite
+				 */
 
 				System.out.println("3");
 				double dist = pollux.getDistance();
@@ -105,19 +131,8 @@ public class ThreadPollux {
 				while (b==true) {
 					try {
 						double d;
-						if(dist<0.3) {
-							pollux.moteurs.tourner(true,1);
-							d=pollux.scan(1,true);
-
-						}else if(dist>0.3 && dist<1.7) {
-							d=pollux.scan(2,true);
-						}else {
-							d=pollux.scan(1,true);
-						}
-						if(d==-1) {
-							b=false;
-						}
-						Delay.msDelay(5000);
+						pollux.scan(2,true);
+						while(pollux.moteurs.isMoving());
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
