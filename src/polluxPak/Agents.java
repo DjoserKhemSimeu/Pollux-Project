@@ -56,17 +56,18 @@ public class Agents {
 		moteurs.avance();
 		if(capteurs.getDistance()<0.4) {
 			double dist=capteurs.getDistance();
+			moteurs.ouvrirPince();
 			Delay.msDelay(300);
 			if(capteurs.getDistance()>dist)
 			{
 				moteurs.speed(350);
-				moteurs.actionPince();
 				moteurs.stop();
+				moteurs.fermerPince();
 				moteurs.speed(650);
 				return true;
 			}else {
 				while(capteurs.getDistance()<0.2) {
-
+					moteurs.fermerPince();
 					moteurs.tourner(true,1);
 				}
 				return false;
