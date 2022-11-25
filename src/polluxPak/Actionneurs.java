@@ -152,11 +152,16 @@ public class Actionneurs {
 	
 
 	}
-	public void actionPince() {
+	public void ouvrirPince() {
 		pince.setSpeed(1400);
 		pince.rotate(6*QuartT);
+	}
+	
+	public void fermerPince(){
+		pince.setSpeed(1400);
 		pince.rotate(-6*QuartT);
 	}
+	
 	public void addAngle(int deg,boolean dir) {
 
 		if(dir==DROITE) {
