@@ -3,22 +3,30 @@ package polluxPak;
 
 
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.port.MotorPort;
+
 import lejos.hardware.port.Port;
 import lejos.robotics.RegulatedMotor;
-import lejos.utility.Delay;
+
 
 
 public class Actionneurs {
-	public static final int QuartT =200;
-	private static final int DQuartT =397;
+	/*
+	 * La classe Actionneurs contient l'ensemble de méthode qui permettent d'utiliser les moteurs:
+	 * pince, roue gauche et roue droite. 
+	 */
 
-	//attributs de direction
+
+	//attributs d'instance définissant la degre de de rotation des roues pour obtenir un angle de 90°
+
+	//en avant
+	public  static final int QuartT =190;
+
+	//en arriere
+	public static final int DQuartT =380;
+
+	//attributs d'instance de direction
 	private static final boolean DROITE=true;
 	private static final boolean GAUCHE=false;
 
@@ -26,72 +34,66 @@ public class Actionneurs {
 	RegulatedMotor r1; // roue droite
 	RegulatedMotor pince; // pince
 	private double angle; // direction
-	private boolean cote;
+
+	// attributs d'instance définissant le sud et le nord du terrain
 	public static boolean SOUTH=true;
 	public static boolean NORTH=false;
-	
 
-// ce constructeur permet d'initialiser nos attributs d'instance, notamment d'expliciter le lien entre les ports, les attributs et méthodes associées à ceux-ci.
+
+	// ce constructeur permet d'initialiser nos attributs d'instance, notamment 
+	//d'expliciter le lien entre les ports, les attributs et méthodes associées à ceux-ci.
 	public Actionneurs (Port A,Port B,Port D,boolean cote) {
+
+		// initialisation des des moteurs avec les port respectifs du robot(ABD)
 		l1 = new EV3LargeRegulatedMotor(A);
 		r1= new EV3LargeRegulatedMotor(B);
 		pince= new EV3LargeRegulatedMotor(D);
-		pince.setSpeed(3000);
+
+
+
+		//intialisation de la vitessse des roue a 650 via la method speed
 		speed(650);
+
+		// synchronization des roues via la methode synchronizeWith de la classe EV3LargeRegulatedMotor
 		l1.synchronizeWith(new RegulatedMotor[] {r1});
 		l1.startSynchronization();
+
+		// definition de l'angle initiale a 0°
 		angle=0;
-		this.cote=cote;
+
 	}
 	public Actionneurs() {
 		// TODO Auto-generated constructor stub
 	}
-	
-	// méthode faisant tourner le moteur vers la gauche jusqu'à l'angle limite de valeur t ;
-	public void rotateG(int t) {
-		l1.endSynchronization();
-		l1.rotate(t,true);
-		l1.startSynchronization();
-		
-	}
-	
-	// méthode faisant tourner le moteur vers la droite jusqu'à l'angle limite de valeur t ;
-	public void rotateR(int t) {
-		l1.endSynchronization();
-		r1.rotateTo(t,true);
-		r1.waitComplete();
-		r1.stop();
-		l1.startSynchronization();
-		
-	}
-	
-	// méthode qui synchronise les deux roues afin qu'elles avancent au même rythme, le temps t passé en paramètre;
-	public  void avance(int t) {
-		l1.startSynchronization();
-			l1.forward();
-			r1.forward();
-			l1.endSynchronization();
-			Delay.msDelay(t);
-			
-	}
-	
-	// méthode qui synchronise les deux roues afin qu'elles avancent au même rythme, sans limite de temps;
+
+
+
+
+
+
+	// méthode qui synchronise les deux roues afin qu'elles avancent au même rythme, 
+	//sans limite de temps qui s'arrete lorsque la methode stop est appelé
 	public  void avance() {
 		l1.startSynchronization();
 		l1.forward();
 		r1.forward();
 		l1.endSynchronization();
-		
-}
-	// méthode qui synchronise les deux roues afin qu'elles reculent au même rythme, sans limite de temps;
+
+	}
+	// méthode qui synchronise les deux roues afin qu'elles reculent au même rythme,
+	//sans limite de temps qui s'arrete lorsque la methode stop est appelé.
 	public void recule() {
 		l1.startSynchronization();
 		l1.backward();
 		r1.backward();
 		l1.endSynchronization();
 	}
-	
-	// méthode qui arrête les deux roues puis ouvre les pinces afin que Pollux se libère du palet qu'il a dans ses pinces
+
+	// méthode qui arrête les deux roues puis ouvre les pinces et recule
+	//afin que Pollux se libère du palet qu'il a dans ses pinces 
+	// l'entier d représente le nombre de Quart de tour a effectuer aprés
+	// avoir lacher le pallet, l'angle est en suite ajouter a l'attribut d'instance via la methode
+	//addAngle
 	public void lacherPallet(int d) {
 		stop();
 		pince.rotate(6*QuartT);
@@ -104,64 +106,41 @@ public class Actionneurs {
 		tournerR(false,d);
 		addAngle(d*90,false);
 	}
-	
-	// return true si un des moteurs(roue) est en mouvement
+
+	// return true si une des roue est en mouvement
 	public boolean isMoving() {
 		return(l1.isMoving()||r1.isMoving());
 	}
-	
+
+	// methode qui retourne angle actuelle de pollux
 	public double getAngle() {
 		return angle;
 	}
-	
-	public void tournerTo(double différence) {
-		l1.endSynchronization();
-		int i=0;
-		if(différence>0) {
-			while(différence<i) {
-				tournerScan(true);
-				i--;
-				
-			}
-		}else {
-			while(différence>i) {
-				tournerScan(false);
-				i++;
-			}
-		}
-		l1.startSynchronization();
-	}
-	public void tournerScan(boolean dir) {
-		l1.endSynchronization();
-		if(dir==DROITE) {
-			r1.rotate(-3,true);
-			l1.rotate(3, true);
-			addAngle(1,DROITE);
-		}else if(dir==GAUCHE) {
-			l1.rotate(-3, true);
-			r1.rotate(3, true);
-			addAngle(1,GAUCHE);
-		}
-		l1.startSynchronization();
-	}
+
+
+	// methode qui arrete les deux roues
 	public void stop() {
 		startS();
 		l1.stop();
 		r1.stop();
 		endS();
-	
+
 
 	}
+	// methode qui ouvre les pince
 	public void ouvrirPince() {
 		pince.setSpeed(1400);
 		pince.rotate(6*QuartT);
 	}
-	
+
+
+	//methode qui ferme les pinces
 	public void fermerPince(){
 		pince.setSpeed(1400);
 		pince.rotate(-6*QuartT);
 	}
-	
+
+	//methode qui incrémente de deg l'attribut angle en fonction de dir (DROITE ou GAUCHE)
 	public void addAngle(int deg,boolean dir) {
 
 		if(dir==DROITE) {
@@ -173,14 +152,17 @@ public class Actionneurs {
 				angle=360-(deg-angle);
 			}
 			else {
-			angle= angle -deg;
+				angle= angle -deg;
 			}
 		}
 		angle%=360;
 	}
+
+	//methode qui fait tourner pollux d'un nombre de quart de tour donner
+	//en fonction d'une direction (DROITE ou GAUCHE)
 	public void tourner(boolean dir,double nbQuartT) {
 		l1.endSynchronization();
-		
+
 		if(dir==DROITE) {
 			r1.rotate((int)(-QuartT*nbQuartT),true);
 			l1.rotate((int)(QuartT*nbQuartT),true);
@@ -192,6 +174,9 @@ public class Actionneurs {
 		}
 		l1.startSynchronization();
 	}
+
+	//methode qui fait tourner en arriere pollux d'un nombre de quart de tour donner
+	//et en fonction dune direction donnée
 	public void tournerR(boolean dir,int nbQuartT) {
 		l1.endSynchronization();
 		if(dir==DROITE) {
@@ -203,49 +188,34 @@ public class Actionneurs {
 			l1.stop();
 			r1.rotate(-DQuartT*nbQuartT);
 			addAngle(nbQuartT*90,GAUCHE);
-			
+
 		}
 		l1.startSynchronization();
 	}
+	// methode qui désynchronize les roues
 	public void endS() {
 		l1.endSynchronization();
 	}
+	// methode qui synchronize les roues
 	public void startS() {
 		l1.startSynchronization();
 	}
+
+
+	//methode qui set la vitesse des roues
 	public void speed(int s) {
 		l1.setSpeed(s);
 		r1.setSpeed(s);
 	}
-	public void recule(int d) {
-		startS();
-		l1.rotate(-d);
-		r1.rotate(-d);
-		endS();
-	}
-	public void flt() {
-		startS();
-		l1.flt();
-		r1.flt();
-		endS();
-	}
-	
 
 
-	public static void main (String[]args) {
-		Actionneurs a=new Actionneurs(MotorPort.A,MotorPort.B,MotorPort.D,true);
-		//a.tournerTo(90);
-		a.pince.rotate(-720);
-		System.out.print(a.getAngle());
-		Delay.msDelay(4000);
-		
-	
-		
-		
-		
-	
-		
-	
 
-	}
+
+
+
+
+
+
+
+
 }

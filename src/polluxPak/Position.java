@@ -1,4 +1,4 @@
-package polluxPax
+package polluxPak;
 
 public class Position {
 	private int x; 
@@ -24,13 +24,13 @@ public class Position {
 		return y;
 	}
 	
-	public int modulo() {
+	/*public int modulo() {
 		return Math.sqrt(x*x+y*y);
 	}
 	
 	public int arg() {
 		return Math.atan(y/x);
 	}
-	
+	*/
 	
 }

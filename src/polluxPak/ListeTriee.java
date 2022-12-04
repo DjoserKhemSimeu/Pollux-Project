@@ -42,6 +42,7 @@ public class ListeTriee extends LinkedList<Double> {
 		 l.add(5.);
 		 l.add(7.);
 		 l.add(2.);
+		 l.add(1.);
 		 ListIterator<Double>it=l.listIterator();
 		 double c;
 		 while(it.hasNext()) {

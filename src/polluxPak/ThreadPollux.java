@@ -40,61 +40,75 @@ public class ThreadPollux {
 			 */
 			
 			pollux.moteurs.avance();
-			while (!pollux.detectionPallet()) {
+			while (!pollux.detectionPallet(true)) {
 
 			}
 
 			pollux.moteurs.stop();
-			pollux.moteurs.tourner(false, 1);
+			pollux.moteurs.tourner(true, 1);
 			Delay.msDelay(500);
 			pollux.moteurs.avance();
-			while(pollux.getDistance()>0.2) {
+			Delay.msDelay(1000);
+			/*while(pollux.getDistance()>0.3) {
 
-			}
+			}*/
 			pollux.moteurs.stop();
-			pollux.moteurs.tourner(true,1);
+			pollux.moteurs.tourner(false,1);
 			Delay.msDelay(500);
 			pollux.moteurs.avance();
 			while(pollux.capteurs.getColor()!= "white"){
+				pollux.eviteRobot();
 			}
 			pollux.moteurs.stop();
 			pollux.moteurs.lacherPallet(1);
-			pollux.moteurs.avance();
-			while(pollux.getColor()=="none") {
+			
+			/*Delay.msDelay(500);
+	while(pollux.getColor()=="none") {
 				
 			}
 			Delay.msDelay(300);
 			pollux.moteurs.stop();
 			pollux.moteurs.tourner(true,1);
-			Delay.msDelay(2000);
-			courant = Etat.B1;
+			Delay.msDelay(2000);*/
+			courant = Etat.BUT;
 			
 
 			
 			
 
 			// Etat Premier but mis B1
-			case 2:
+		//	case 2:
 				
 				/* Pollux vas avancer en detectant les pallet jusqua atteindre la premiere ligne de 
 				 *couleur pour tourner a gauche et attraper le premier pallet qui'il detecte 
 				 *pour le deposer dans l'enbut et se tourner a 90°
 				 */
-				System.out.println("2");
+				/*System.out.println("2");
 				 int goal=0;
-				 while(pollux.getColor()!="blue"){
-					if(pollux.detectionPallet()) {
+				 pollux.moteurs.startS();
+				 pollux.moteurs.avance();
+				 pollux.moteurs.ouvrirPince();
+				while(!pollux.detectionPallet(false)) {
+					
+				}
+						pollux.moteurs.fermerPince();
 						goal++;
+						pollux.moteurs.stop();
+						pollux.moteurs.endS();
 						pollux.moteurs.tourner(true,2);
-					 }
 					Delay.msDelay(500);
-				 }
+				 
 				 if(goal==0) {
 					 Delay.msDelay(300);
 					 pollux.moteurs.stop();
 					 pollux.moteurs.tourner(false,1);
 					 Delay.msDelay(500);
 					 pollux.moteurs.avance();
+					
+					 while(! pollux.detectionPallet(false)) {
+						 
+					 }
+					
 					
 					 pollux.moteurs.stop();
 
@@ -107,7 +121,7 @@ public class ThreadPollux {
 				 pollux.moteurs.stop();
 				 pollux.moteurs.lacherPallet(1);
 
-				 courant=Etat.BUT;
+				 courant=Etat.BUT;*/
 
 
 
@@ -130,6 +144,19 @@ public class ThreadPollux {
 				boolean b=true;
 				while (b==true) {
 					try {
+						 if(dist<0.5) {
+							 pollux.moteurs.startS();
+							 pollux.moteurs.recule();
+							 Delay.msDelay(500);
+							 pollux.moteurs.stop();
+							 pollux.moteurs.endS();
+						 }else if(dist>1.5) {
+							 pollux.moteurs.startS();
+							 pollux.moteurs.avance();
+							 Delay.msDelay(500);
+							 pollux.moteurs.stop();
+							 pollux.moteurs.endS();
+						 }
 						double d;
 						pollux.scan(2,true);
 						while(pollux.moteurs.isMoving());
@@ -192,7 +219,7 @@ public class ThreadPollux {
 				}
 				pollux.moteurs.avance();
 				while(pollux.getDistance()>0.2 ) {
-					if( pollux.detectionPallet()) {
+					if( pollux.detectionPallet(true)) {
 						but++;
 						pollux.moteurs.stop();
 						switch(i%3) {
@@ -247,7 +274,7 @@ public class ThreadPollux {
 				pollux.moteurs.r1.forward();
 
 				while(pollux.getDistance()>0.2 ) {
-					if( pollux.detectionPallet()) {
+					if( pollux.detectionPallet(true)) {
 						but++;
 						pollux.moteurs.r1.stop();
 						pollux.moteurs.l1.stop();
@@ -319,7 +346,7 @@ public class ThreadPollux {
 				pollux.moteurs.r1.forward();
 
 				while(pollux.getDistance()>0.2 ) {
-					if( pollux.detectionPallet()) {
+					if( pollux.detectionPallet(true)) {
 						but++;
 						pollux.moteurs.r1.stop();
 						pollux.moteurs.l1.stop();

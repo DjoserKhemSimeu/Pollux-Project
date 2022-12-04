@@ -2,74 +2,129 @@ package polluxPak;
 
 
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+
 import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
 
-import lejos.hardware.Button;
-import lejos.hardware.lcd.LCD;
-import lejos.hardware.port.MotorPort;
+
+
 import lejos.hardware.port.Port;
-import lejos.hardware.port.SensorPort;
+
 import lejos.utility.Delay;
 
 
 public class Agents {
+
+	/*
+	 * La classe Agent coordonne les différentes classes du code en les implémentant
+	 * sous forme d'attribut.
+	 */
+
+	// l'attribut capteurs de la classe Capteurs qui utilise les capteurs du robot
 	Capteurs capteurs;
+
+	// l'attribut moteurs de la classe Actionneurs qui utilise les moteurs du robot
 	Actionneurs moteurs;
+
+	// L'attribut colorT qui représente la couleur courante perçue par le capteur de couleur
 	public String colorT;
+
+
+	// l'attribut espace de la classe espace qui représente le terrain sur lequel évolue l'agent
 	public Espace e;
 
-	public Agents() {
-		// TODO Auto-generated constructor stub
-	}
+
+	/*
+	 * Le constructeur de la classe prend en parametre les différent port du robot afin de faire aux
+	 * constructeurs de la classe Capteurs et Actionneurs. Il prend également en parametre des entier x
+	 * et y afin de définir la case dans laquelle demmarre pollux 
+	 */
 	public Agents(Port A, Port B, Port D, Port s1, Port s3,Port s4,int x,int y) throws IOException {
-		// 
+		// appel au constructeur de la classe Capteurs
 		capteurs= new Capteurs (s1,s3,s4);
+
+		// apppel au constructeur de la classe Actionneurs
 		moteurs= new Actionneurs (A,B,D, true);
+
+		//appel au constructeur de la classe Espace
 		e= new Espace(x,y,this);
+
+		//la premiere couleur percue par pollux est definie comme none mais vas etre mise a jour au premier
+		// appel a la methode getColor
 		colorT="none";
-		moteurs.speed(550);
+
 
 	}
+
+	// la methode getAngle retourne l'angle actuel de pollux via la classe Actionneurs
 	public double getAngle(){
 		return moteurs.getAngle();
 	}
+
+	// la methode  getDistance retourne la distance actuelle perçue par pollux via la classe Capteurs
 	public double getDistance() {
 		return capteurs.getDistance();
 	}
-	public boolean detectionPallet() {
+
+	/*
+	 * la methode détectionPallet retourne true si un pallet est perçue ou false sinon, un pallet est détecté si 
+	 * le capteurs de distance percoit une distance inférieur a 40 cm puis ,après un delais de 300 ms,  le meme capteur
+	 * percoit une distance supèrieure à la précédente distance perçue, le parametre booleen b défini si le pallet doit etre 
+	 * attrapé ou non aprés l'avoir perçue.
+	 */
+	public boolean detectionPallet(boolean b) {
+		// pollux avance
 		moteurs.avance();
+
+		// appel a la méthode évitePallet afin de prendre en compte  la présence d'un robot  et de mettre en place la procedure
+		// d'évitement.
+		eviteRobot();
+
+
+		// condition: si la distance captée est inférieure a 40 cm
 		if(capteurs.getDistance()<0.4) {
+
+			// le double dist enregistre la distance captée
 			double dist=capteurs.getDistance();
-			moteurs.ouvrirPince();
+
+
+			// Delais
 			Delay.msDelay(300);
+
+			//condition: si la distance enregistrée est inférieure a la nouvelle distance perçue
 			if(capteurs.getDistance()>dist)
 			{
-				moteurs.speed(350);
-				moteurs.stop();
-				moteurs.fermerPince();
-				moteurs.speed(650);
+
+				// condition: si le paramètre b = true
+				if(b) {
+
+
+					// procèdure pour attraper le pallet: le robot ralentis, les pince souvre pui se ferme et le robot reprend 
+					//sa vitesse
+					moteurs.speed(300);
+					moteurs.ouvrirPince();
+
+					moteurs.fermerPince();
+					moteurs.speed(650);
+				}
+				// retourne true car un pallet a été percue
 				return true;
+				
+				//si la distance percue est inferieure a 40 cm mais qu'il n'y a pas dist<la nouvelle distance percue
 			}else {
+				
+				// tourne a droite tant que la distance est inférieure a 20cm
 				while(capteurs.getDistance()<0.2) {
 					moteurs.fermerPince();
 					moteurs.tourner(true,1);
 				}
+				// pallet pas percue
 				return false;
 
 			}
@@ -77,33 +132,29 @@ public class Agents {
 
 
 		}
+		// retourne false car pallet pas percue
 		return false;
 	}
+	
+	
 
-	public boolean tournerLigne(String c, int i) {
-		if(capteurs.getColor().equals(c)) {
-			return false;
-		}else {
-			if(i%2==1) {
-				moteurs.tourner(true,1);
-			}else {
-				moteurs.tourner(false,1);
-			}
-			return true;
-		}
-
-	}
+	// methode qui retourne true si une ligne de couleur a été passé
 	public boolean passeLigne() {
 
+		//Appel a la méthode passeLigneR qui retourne la nouvelle couleur percue
+		//condition: si la nouvelle couleurs percue est égale a l'attribut colorT
 		if(passeLigneR()==null) {
 			return false;
 		}else {
+			
+			// les lignes noires ne sont pas pris en compte
 			if(passeLigneR().equals("black")) {
 				return false;
 			}
 			return true;
 		}
 	}
+	// methode passeLigneR qui retourne la nouvelle couleur percue et null si pas de nouvelle couleur percue
 	public String passeLigneR() {
 		if(capteurs.getColor().equals(colorT)) {
 			return null;
@@ -111,215 +162,39 @@ public class Agents {
 			return capteurs.getColor();
 		}
 	}
+	// methode get color qui retourne la couleur percue par le capteur de couleur
 	public String getColor() {
 		return capteurs.getColor();
 	}
+	
+	// methode majColor qui mets a jour l'attribut colorT
 	public String majColor() {
 		colorT=getColor();
 		return colorT;
 
 	}
-	public static HashMap<Integer,Double>chercheDis(ArrayList<Double> dist){
-		HashMap<Integer,Double> res=new HashMap<Integer,Double>();
-		double delta=0.25;
-		int i=1;
-		double prec=dist.get(0);
-		while (i<dist.size()) {
-			if(Math.abs(dist.get(i)-prec)>delta) {
-				res.put(i*90/dist.size(),Math.abs(dist.get(i)-prec));
-			}
-			prec=dist.get(i);
-			i++;
-
-		}
-		return res;
-	}
-
-	public double tabMoy(double[]d) {
-		double sum=0;
-		for(int i=0;i<d.length;i++) {
-			sum+=d[i];
-		}
-		return sum/d.length;
-	}
-
-
-	public double moyArrays(Collection<Double>t) {
-		double res=0;
-		for(Double d:t) {
-			res+=d;
-		}
-		return res/t.size();
-	}
-	public double moy2Arrays(ArrayList<Double>t) {
-		double res=0;
-		for(Double d:t) {
-			res+=d*d;
-		}
-		return res/t.size();
-	}
-	public double ecartType(ArrayList<Double>t) {
-		double res=0;
-		double m=moyArrays(t);
-		for(Double d:t) {
-			double r=d-m;
-			res+=Math.pow(r,2);
-		}
-		return Math.sqrt(res/t.size());
-	}
-	public ArrayList<Double> distDiff(){
-		ArrayList<Double>distances=new ArrayList<Double>();
-		moteurs.l1.endSynchronization();
-		moteurs.l1.setSpeed(30);
-		moteurs.r1.setSpeed(30);
-
-		moteurs.l1.rotate(Actionneurs.QuartT,true);
-		moteurs.r1.rotate(-Actionneurs.QuartT,true);
-
-
-
-		while(moteurs.isMoving()) {
-			double []moy=new double[10];
-			for(int id=0;id<moy.length;id++) {
-				double f=getDistance();
-				if(f!=Double.POSITIVE_INFINITY) {
-					moy[id]= f;
-
-				}else {
-					moy[id]=2.5;
-				}
-				double m=tabMoy(moy);
-				int cpt=0;
-				ArrayList<Double> rep=new ArrayList<Double>();
-				while (cpt<moy.length) {
-					if(Math.abs(moy[cpt]-m)<0.1) {
-						rep.add(moy[cpt]);
-					}
-					cpt++;
-				}
-				double[] cast=new double[rep.size()];
-				int i=0;
-				for (Double d: rep) {
-					cast[i]=d;
-					i++;
-				}
-
-
-
-				System.out.println(tabMoy(cast));
-
-				distances.add(tabMoy(cast));
-
-
-			}
-
-		}
-		ArrayList<Double>res=new ArrayList<Double>();
-		for(int i=0;i+1<distances.size();i++) {
-			res.add(Math.abs(distances.get(i)-distances.get(i+1)));
-		}
-
-
-		return res;
-
-
-	}
-	public Map<Integer,Double> cleanDis(Map<Integer,Double> dis){
-		ArrayList<Integer> agl=new ArrayList<Integer>();
-		ArrayList<Integer> agl2=new ArrayList<Integer>();
-		for(Integer c:dis.keySet()) {
-			agl.add (c);
-			agl2.add(c);
-		}
-		ArrayList<Integer>bin=new ArrayList<Integer>();
-		Set<Integer>memo=new HashSet<Integer>();
-		for(Integer i:agl) {
-			if(agl2.isEmpty()) {
-				break;
-			}
-			for(Integer j:agl2) {
-				if(Math.abs(i-j)<10&&i!=j && !memo.contains(j)) {
-					memo.add(i);
-
-					memo.add(j);
-					bin.add(j);
-					System.out.println("oui");
-				}
-			}
-		}
-		for(Integer iv:bin) {
-			dis.remove(iv);
-		}
-
-		return dis;
-	}
+	// methode get espace qui retourne l'attribut espace
 	public Espace getEspace() {
 		return e;
 	}
-	public void scanf(int agl) {
-		moteurs.endS();
-		ArrayList <Double>distances=new ArrayList<Double>();
-		moteurs.speed(50);
-		moteurs.l1.rotate(2*Actionneurs.QuartT,true);
-		moteurs.r1.rotate(-2*Actionneurs.QuartT,true);
-
-		while(moteurs.isMoving()) {
-			double []moy=new double[10];
-			for(int i=0;i<moy.length;i++) {
-				double f=getDistance();
-				if(f!=Double.POSITIVE_INFINITY) {
-					moy[i]= f;
-
-				}else {
-					moy[i]=2.5;
-				}
-			}
-			double m=tabMoy(moy);
-			int cpt=0;
-			ArrayList<Double> rep=new ArrayList<Double>();
-			while (cpt<moy.length) {
-				if(Math.abs(moy[cpt]-m)<0.1) {
-					rep.add(moy[cpt]);
-				}
-				cpt++;
-			}
-			double[] cast;
-			if(moy.length==0) {
-				cast=new double[] {m};
-			}else {
-				cast=new double[moy.length];
-				int i=0;
-				for (Double d: rep) {
-					cast[i]=d;
-					i++;
-				}
-			}
-
-
-
-			System.out.println(tabMoy(cast));
-
-			distances.add(tabMoy(cast));
+	
+	
+	// methode éviteRobot qui vas faire esquiver le robot par la droite
+	public void eviteRobot() {
+		if(getDistance()<0.10) {
+			moteurs.stop();
+			moteurs.endS();
+			moteurs.tourner(true, 1);
+			moteurs.startS();
+			moteurs.avance();
+			Delay.msDelay(500);
+			moteurs.stop();
+			moteurs.endS();
+			moteurs.tourner(false, 1);
+			moteurs.startS();
+			moteurs.avance();
 
 		}
-		moteurs.startS();
-		ArrayList<Double>diff=new ArrayList<Double>();
-		for(int i=0;i+1<distances.size();i++) {
-			diff.add(Math.abs(distances.get(i)-distances.get(i+1)));
-		}
-		double moyenDiff=moyArrays(diff);
-		double eDiff=ecartType(diff);
-		double delta=0.2;
-		Map <Integer,Double> dict=new HashMap<Integer,Double>();
-		for(int compt=0;compt<diff.size();compt++) {
-			double v=diff.get(compt);
-			if(v>moyenDiff+eDiff+delta) {
-				dict.put(compt*agl/diff.size(),distances.get(compt));
-			}	
-		}
-		dict=cleanDis(dict);
-		System.out.println(dict.keySet());
-
 	}
 
 	/*Méthode scan(int n) qui prend en parametre un nombre de quart de tour a effectuer
@@ -351,8 +226,8 @@ public class Agents {
 
 		// debut de la rotation en faisant appel a Actionneurs.QuartT(90°)
 		if(dir) {
-		moteurs.l1.rotate(n*Actionneurs.QuartT,true);
-		moteurs.r1.rotate(-n*Actionneurs.QuartT,true);
+			moteurs.l1.rotate(n*Actionneurs.QuartT,true);
+			moteurs.r1.rotate(-n*Actionneurs.QuartT,true);
 		}else {
 			moteurs.l1.rotate(-n*Actionneurs.QuartT,true);
 			moteurs.r1.rotate(n*Actionneurs.QuartT,true);
@@ -395,7 +270,7 @@ public class Agents {
 				fenetre.addLast(f);
 
 			}else {
-				fenetre.addLast(2.5);
+				fenetre.addLast(fenetre.getLast());
 			}
 
 			// ajout de tout les element de fentre dans l pour les trier
@@ -417,18 +292,32 @@ public class Agents {
 		ListIterator<Double> it=rep.listIterator();
 		int i=0;
 		Double c;
+		// definition du delta a 20 cm
 		double delta=0.2;
+		
+		
+		// durant les observation nous avons remarquée que les 10 premiere valeurs n'était pas fiable
+		// nous avons donc décidé de ne pas les prendre en compte
 		while (i<10) {
 			it.next();
 			i++;
 		}
+		
+		// parcour
 		while(it.hasNext()) {
 			c=it.next();
+			/*
+			 * on capte la premiere discontinuité pour l'associer a une seconde (debut ey fin du pallet
+			 */
 			if(c>delta) {
 				int i2=i;
-				System.out.print(i+"*");
+				for(int copt=0;copt<10;copt++) {
+					it.next();
+				}
+				i+=10;
+				System.out.print(i2+"*");
 				boolean pass=false;
-				while (it.hasNext()&&pass==false) {
+				while (it.hasNext()&&pass==false&& i-i2<40) {
 					c=it.next();
 					if(c>delta) {
 						dis.put((i+i2)/2,distances.get(i));
@@ -444,13 +333,14 @@ public class Agents {
 
 
 		moteurs.addAngle(n*90,true);
+		
+		// recuperation de la plus petite distance parmis les pallets
 		double agl=0;
 		double min=Double.MAX_VALUE;
 		for(Integer k: dis.keySet()) {
 			if(min>dis.get(k)) {
 				agl=k;
 				min=dis.get(k);
-				System.out.print(rep.get(k)+" "+"("+k+") ");
 			}
 		}
 		agl=(agl*(n*90))/rep.size();
@@ -458,38 +348,48 @@ public class Agents {
 			return -1;
 		}
 
-		System.out.println("=");
-		System.out.println(dis.keySet());
-		System.out.println(agl);
+		// pollux ouvre la pince et se retourne vers le pallet
 		double diff= n*90-agl;
-		
+		moteurs.ouvrirPince();
+
 		if(dir) {
 
-		moteurs.tourner(false,diff/90);
+			moteurs.tourner(false,diff/90);
 		}else {
 			moteurs.tourner(true,diff/90);
 		}
-		Delay.msDelay(5000);
-		moteurs.speed(650);
+		Delay.msDelay(8000);
+		moteurs.speed(850);
+		
+		// pollux avance jusquà detecter un pallet
 		moteurs.startS();
 		moteurs.avance();
-		while(!detectionPallet()) {
+		while(!detectionPallet(false)) {
+			eviteRobot();
 
 		}
-		
+		Delay.msDelay(500);
 		moteurs.stop();
 		moteurs.endS();
+		moteurs.fermerPince();
+
+
+
+		/// pollux se retourne vers l'enbut
 		if(dir) {
-		moteurs.tourner(true,1+(diff/90));
+			moteurs.tourner(true,1+(diff/90));
 		}else {
 			moteurs.tourner(false,1+(diff/90));
 		}
-		Delay.msDelay(5000);
+		Delay.msDelay(2000);
+		
+		// avance jusqua capter une ligne blache pui dépose le palet
 		moteurs.startS();
 		moteurs.avance();
 		while(capteurs.getColor()!= "white"){
 		}
 		moteurs.stop();
+		//lache le pallet et se retourne de 90°
 		moteurs.lacherPallet(1);
 
 		return agl;
@@ -499,64 +399,16 @@ public class Agents {
 
 	}
 
-	public void chercheAngle(double n) throws IOException {
-		double diff= getAngle()-n;
+	
 
-
-	}
-	public void action() {
-
-		while(!Button.ENTER.isDown()) {
-			colorT=capteurs.getColor();
-
-
-
-
-			LCD.clear(3);
-			LCD.clear(4);
-			LCD.clear(5);
-			LCD.clear(6);
-			LCD.drawString("Distance : "+capteurs.getDistance(), 0,3);
-			LCD.drawString("couleur : "+colorT, 0,4);
-			LCD.drawString("case : ", 0,5);
-			LCD.drawString("angle : "+getAngle(), 0,6);
-
-
-
-
-
-
-			//capteurs.maj();
-			//moteurs.avance();
-			Delay.msDelay(100);
-			///e.changementEsp();
-			//detectionPallet();
-
-
-		}
-
-		capteurs.close();
-		moteurs.stop();
-		moteurs.l1.close();
-		moteurs.r1.close();
-
-	}
+	/*
+	 * methode majPos que l'on souhaitait utiliser pour mettre a jour en temps reel la position de pollux sur l'espace mais
+	 * plusieur erreur donc pas utiliser
+	 */
 	public String MajPos() {
 		e.changementCase();
 		return String.valueOf(e.getNumCase());
 	}
-	public static void main (String[]args) throws IOException {
-		Agents robot= new Agents (MotorPort.A,MotorPort.B,MotorPort.D,SensorPort.S1,SensorPort.S3,SensorPort.S4,0,1);
-		robot.scan(1,true);
-		Delay.msDelay(10000);
-
-
-
-
-
-
-
-	}
-
+	
 }
 
