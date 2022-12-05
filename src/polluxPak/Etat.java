@@ -3,8 +3,8 @@ package polluxPak;
 public class Etat {
 	
 	/*
-	 * La classe ETAT représentent les états possible de pollux définie dans le diagramme d'etat de pollux
-	 * certain n'on pas été utiliser dans le code suit a des probleme de derniere minute et par manque d'organisation:
+	 * La classe ETAT représente les états possibleS de pollux définiS dans le diagramme à état de pollux
+	 * certains n'ont pas été utilisés dans le code suite à des problèmes de derniere minute et par manque d'organisation:
 	 * les etat reelement utiliser sont : P0 et BUT pour obtenir le premier pallet en dur et répeter le scan plusieur fois
 	 */
 	
