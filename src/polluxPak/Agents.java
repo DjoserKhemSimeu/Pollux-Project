@@ -41,7 +41,7 @@ public class Agent {
 
 
 	/*
-	 * Le constructeur de la classe prend en paramètres les différents ports du robot afin de faire aux
+	 * Le constructeur de la classe prend en paramètres les différents ports du robot afin de faire appel aux
 	 * constructeurs de la classe Capteur et Actionneur. Il prend également en paramètres des entiers x
 	 * et y afin de définir la case dans laquelle demmarre pollux 
 	 */
