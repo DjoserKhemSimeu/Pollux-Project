@@ -11,9 +11,9 @@ import lejos.robotics.RegulatedMotor;
 
 
 
-public class Actionneurs {
+public class Actionneur {
 	/*
-	 * La classe Actionneurs contient l'ensemble de méthode qui permettent d'utiliser les moteurs:
+	 * La classe Actionneur contient l'ensemble de méthode qui permettent d'utiliser les moteurs:
 	 * pince, roue gauche et roue droite. 
 	 */
 
@@ -42,7 +42,7 @@ public class Actionneurs {
 
 	// ce constructeur permet d'initialiser nos attributs d'instance, notamment 
 	//d'expliciter le lien entre les ports, les attributs et méthodes associées à ceux-ci.
-	public Actionneurs (Port A,Port B,Port D,boolean cote) {
+	public Actionneur (Port A,Port B,Port D,boolean cote) {
 
 		// initialisation des des moteurs avec les port respectifs du robot(ABD)
 		l1 = new EV3LargeRegulatedMotor(A);
@@ -51,7 +51,7 @@ public class Actionneurs {
 
 
 
-		//intialisation de la vitessse des roue a 650 via la method speed
+		//intialisation de la vitessse des roues a 650 via la method speed
 		speed(650);
 
 		// synchronization des roues via la methode synchronizeWith de la classe EV3LargeRegulatedMotor
@@ -62,7 +62,7 @@ public class Actionneurs {
 		angle=0;
 
 	}
-	public Actionneurs() {
+	public Actionneur() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -72,7 +72,7 @@ public class Actionneurs {
 
 
 	// méthode qui synchronise les deux roues afin qu'elles avancent au même rythme, 
-	//sans limite de temps qui s'arrete lorsque la methode stop est appelé
+	//sans limite de temps qui s'arrete lorsque la methode stop est appelée
 	public  void avance() {
 		l1.startSynchronization();
 		l1.forward();
@@ -91,10 +91,10 @@ public class Actionneurs {
 
 	// méthode qui arrête les deux roues puis ouvre les pinces et recule
 	//afin que Pollux se libère du palet qu'il a dans ses pinces 
-	// l'entier d représente le nombre de Quart de tour a effectuer aprés
-	// avoir lacher le pallet, l'angle est en suite ajouter a l'attribut d'instance via la methode
+	// l'entier d représente le nombre de Quart de tour a effectuer après
+	// avoir lacher le palet, l'angle est en suite ajouté a l'attribut d'instance via la methode
 	//addAngle
-	public void lacherPallet(int d) {
+	public void lacherPalet(int d) {
 		stop();
 		pince.rotate(6*QuartT);
 		startS();
@@ -112,7 +112,7 @@ public class Actionneurs {
 		return(l1.isMoving()||r1.isMoving());
 	}
 
-	// methode qui retourne angle actuelle de pollux
+	// methode qui retourne angle actuel de pollux
 	public double getAngle() {
 		return angle;
 	}
@@ -127,7 +127,7 @@ public class Actionneurs {
 
 
 	}
-	// methode qui ouvre les pince
+	// methode qui ouvre les pinces
 	public void ouvrirPince() {
 		pince.setSpeed(1400);
 		pince.rotate(6*QuartT);
@@ -158,7 +158,7 @@ public class Actionneurs {
 		angle%=360;
 	}
 
-	//methode qui fait tourner pollux d'un nombre de quart de tour donner
+	//methode qui fait tourner pollux d'un nombre de quart de tour donné
 	//en fonction d'une direction (DROITE ou GAUCHE)
 	public void tourner(boolean dir,double nbQuartT) {
 		l1.endSynchronization();
@@ -175,8 +175,8 @@ public class Actionneurs {
 		l1.startSynchronization();
 	}
 
-	//methode qui fait tourner en arriere pollux d'un nombre de quart de tour donner
-	//et en fonction dune direction donnée
+	//methode qui fait tourner pollux en arriere d'un nombre de quart de tour donné
+	//et en fonction d'une direction donnée
 	public void tournerR(boolean dir,int nbQuartT) {
 		l1.endSynchronization();
 		if(dir==DROITE) {
