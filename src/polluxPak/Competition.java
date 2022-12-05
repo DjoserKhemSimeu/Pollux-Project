@@ -6,6 +6,8 @@ import lejos.hardware.Button;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 
+// classe qui permet l'utilisation du code lors de la compétition, un appui sur le bouton lance le programme issu de ThreadPollux
+
 public class Competition {
 
 	public Competition() {
