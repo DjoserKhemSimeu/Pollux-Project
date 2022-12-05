@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-
+//class qui permet d'instancier une liste triée à laquelle les valeurs seront ajoutées suivant la définition de son constructeur
 
 public class ListeTriee extends LinkedList<Double> {
 	 public ListeTriee() {
