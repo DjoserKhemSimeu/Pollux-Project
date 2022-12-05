@@ -19,18 +19,18 @@ import lejos.hardware.port.Port;
 import lejos.utility.Delay;
 
 
-public class Agents {
+public class Agent {
 
 	/*
 	 * La classe Agent coordonne les différentes classes du code en les implémentant
 	 * sous forme d'attribut.
 	 */
 
-	// l'attribut capteurs de la classe Capteurs qui utilise les capteurs du robot
-	Capteurs capteurs;
+	// l'attribut capteur de la classe Capteur qui utilise les capteurs du robot
+	Capteur capteur;
 
-	// l'attribut moteurs de la classe Actionneurs qui utilise les moteurs du robot
-	Actionneurs moteurs;
+	// l'attribut moteur de la classe Actionneur qui utilise les moteurs du robot
+	Actionneur moteur;
 
 	// L'attribut colorT qui représente la couleur courante perçue par le capteur de couleur
 	public String colorT;
@@ -41,64 +41,64 @@ public class Agents {
 
 
 	/*
-	 * Le constructeur de la classe prend en parametre les différent port du robot afin de faire aux
-	 * constructeurs de la classe Capteurs et Actionneurs. Il prend également en parametre des entier x
+	 * Le constructeur de la classe prend en paramètres les différents ports du robot afin de faire aux
+	 * constructeurs de la classe Capteur et Actionneur. Il prend également en paramètres des entiers x
 	 * et y afin de définir la case dans laquelle demmarre pollux 
 	 */
-	public Agents(Port A, Port B, Port D, Port s1, Port s3,Port s4,int x,int y) throws IOException {
-		// appel au constructeur de la classe Capteurs
-		capteurs= new Capteurs (s1,s3,s4);
+	public Agent(Port A, Port B, Port D, Port s1, Port s3,Port s4,int x,int y) throws IOException {
+		// appel au constructeur de la classe Capteur
+		capteur= new Capteur (s1,s3,s4);
 
 		// apppel au constructeur de la classe Actionneurs
-		moteurs= new Actionneurs (A,B,D, true);
+		moteur= new Actionneur (A,B,D, true);
 
 		//appel au constructeur de la classe Espace
 		e= new Espace(x,y,this);
 
-		//la premiere couleur percue par pollux est definie comme none mais vas etre mise a jour au premier
+		//la premiere couleur percue par pollux est definie comme none mais va etre mise à jour au premier
 		// appel a la methode getColor
 		colorT="none";
 
 
 	}
 
-	// la methode getAngle retourne l'angle actuel de pollux via la classe Actionneurs
+	// la methode getAngle retourne l'angle actuel de pollux via la classe Actionneur
 	public double getAngle(){
-		return moteurs.getAngle();
+		return moteur.getAngle();
 	}
 
-	// la methode  getDistance retourne la distance actuelle perçue par pollux via la classe Capteurs
+	// la methode  getDistance retourne la distance actuelle perçue par pollux via la classe Capteur
 	public double getDistance() {
-		return capteurs.getDistance();
+		return capteur.getDistance();
 	}
 
 	/*
-	 * la methode détectionPallet retourne true si un pallet est perçue ou false sinon, un pallet est détecté si 
-	 * le capteurs de distance percoit une distance inférieur a 40 cm puis ,après un delais de 300 ms,  le meme capteur
-	 * percoit une distance supèrieure à la précédente distance perçue, le parametre booleen b défini si le pallet doit etre 
+	 * la methode détectionPalet retourne true si un palet est perçue ou false sinon, un palet est détecté si 
+	 * le capteur de distance perçoit une distance inférieur à 40 cm puis ,après un delais de 300 ms,  le même capteur
+	 * percoit une distance supérieure à la précédente distance perçue, le parametre booleen b défini si le palet doit être 
 	 * attrapé ou non aprés l'avoir perçue.
 	 */
-	public boolean detectionPallet(boolean b) {
+	public boolean detectionPalet(boolean b) {
 		// pollux avance
-		moteurs.avance();
+		moteur.avance();
 
-		// appel a la méthode évitePallet afin de prendre en compte  la présence d'un robot  et de mettre en place la procedure
+		// appel a la méthode évitePalet afin de prendre en compte  la présence d'un robot  et de mettre en place la procedure
 		// d'évitement.
 		eviteRobot();
 
 
 		// condition: si la distance captée est inférieure a 40 cm
-		if(capteurs.getDistance()<0.4) {
+		if(capteur.getDistance()<0.4) {
 
 			// le double dist enregistre la distance captée
-			double dist=capteurs.getDistance();
+			double dist=capteur.getDistance();
 
 
 			// Delais
 			Delay.msDelay(300);
 
 			//condition: si la distance enregistrée est inférieure a la nouvelle distance perçue
-			if(capteurs.getDistance()>dist)
+			if(capteur.getDistance()>dist)
 			{
 
 				// condition: si le paramètre b = true
@@ -107,24 +107,24 @@ public class Agents {
 
 					// procèdure pour attraper le pallet: le robot ralentis, les pince souvre pui se ferme et le robot reprend 
 					//sa vitesse
-					moteurs.speed(300);
-					moteurs.ouvrirPince();
+					moteur.speed(300);
+					moteur.ouvrirPince();
 
-					moteurs.fermerPince();
-					moteurs.speed(650);
+					moteur.fermerPince();
+					moteur.speed(650);
 				}
-				// retourne true car un pallet a été percue
+				// retourne true car un palet a été perçu
 				return true;
 				
-				//si la distance percue est inferieure a 40 cm mais qu'il n'y a pas dist<la nouvelle distance percue
+				//si la distance percue est inferieure à 40 cm mais qu'il n'y a pas dist<la nouvelle distance percue
 			}else {
 				
-				// tourne a droite tant que la distance est inférieure a 20cm
-				while(capteurs.getDistance()<0.2) {
-					moteurs.fermerPince();
-					moteurs.tourner(true,1);
+				// tourne à droite tant que la distance est inférieure à 20cm
+				while(capteur.getDistance()<0.2) {
+					moteur.fermerPince();
+					moteur.tourner(true,1);
 				}
-				// pallet pas percue
+				// palet pas percue
 				return false;
 
 			}
@@ -132,7 +132,7 @@ public class Agents {
 
 
 		}
-		// retourne false car pallet pas percue
+		// retourne false car palet pas percue
 		return false;
 	}
 	
@@ -142,7 +142,7 @@ public class Agents {
 	public boolean passeLigne() {
 
 		//Appel a la méthode passeLigneR qui retourne la nouvelle couleur percue
-		//condition: si la nouvelle couleurs percue est égale a l'attribut colorT
+		//condition: si la nouvelle couleur percue est égale à l'attribut colorT
 		if(passeLigneR()==null) {
 			return false;
 		}else {
@@ -156,18 +156,18 @@ public class Agents {
 	}
 	// methode passeLigneR qui retourne la nouvelle couleur percue et null si pas de nouvelle couleur percue
 	public String passeLigneR() {
-		if(capteurs.getColor().equals(colorT)) {
+		if(capteur.getColor().equals(colorT)) {
 			return null;
 		}else {
-			return capteurs.getColor();
+			return capteur.getColor();
 		}
 	}
 	// methode get color qui retourne la couleur percue par le capteur de couleur
 	public String getColor() {
-		return capteurs.getColor();
+		return capteur.getColor();
 	}
 	
-	// methode majColor qui mets a jour l'attribut colorT
+	// methode majColor qui met à jour l'attribut colorT
 	public String majColor() {
 		colorT=getColor();
 		return colorT;
@@ -182,32 +182,32 @@ public class Agents {
 	// methode éviteRobot qui vas faire esquiver le robot par la droite
 	public void eviteRobot() {
 		if(getDistance()<0.10) {
-			moteurs.stop();
-			moteurs.endS();
-			moteurs.tourner(true, 1);
-			moteurs.startS();
-			moteurs.avance();
+			moteur.stop();
+			moteur.endS();
+			moteur.tourner(true, 1);
+			moteur.startS();
+			moteur.avance();
 			Delay.msDelay(500);
-			moteurs.stop();
-			moteurs.endS();
-			moteurs.tourner(false, 1);
-			moteurs.startS();
-			moteurs.avance();
+			moteur.stop();
+			moteur.endS();
+			moteur.tourner(false, 1);
+			moteur.startS();
+			moteur.avance();
 
 		}
 	}
 
-	/*Méthode scan(int n) qui prend en parametre un nombre de quart de tour a effectuer
+	/*Méthode scan(int n) qui prend en parametre un nombre de quart de tour à effectuer
 	 * 
-	 * Thechnique utiliser: prendre un echantillon de 5 valeurs ,
+	 * Technique utiliser: prendre un echantillon de 5 valeurs ,
 	 * l'échantillon est une fenetre glissante, pour chaque nouvelle distance la plus ancienne est suppr
-	 * et la nouvelle est stocker, calculer max-min de l'échantillon
+	 * et la nouvelle est stockée, calculer max-min de l'échantillon
 	 * stocker cette valeurs dans une liste res. Parcourir la liste res afin de trouver des valeurs > delta
-	 * stocker ces valeur dans un dictionnaire de relation indice dans la liste-distance percue
-	 * selectioner dans le dictionnaire la indice dans la list a la distance la plus faible et la retourner 
+	 * stocker ces valeurs dans un dictionnaire de relation indice dans la liste-distance percue
+	 * selectioner dans le dictionnaire l'indice dans la list à la distance la plus faible et la retourner 
 	 * 
-	 * Problème rencontrer:  lorsque aucun pallet est sur le terrain il detecte quand meme une discontinuitée
-	 * et lka discontinuitée percu lorsrqu'il y'a un palet n'es pas précise
+	 * Problème rencontrer:  lorsque aucun pallet est sur le terrain il detecte quand même une discontinuitée
+	 * et la discontinuitée percu lorsqu'il y'a un palet n'est pas précise
 	 */
 
 
@@ -220,17 +220,17 @@ public class Agents {
 		// création du tableau des distances qui stocks les distances percues
 		ArrayList<Double>distances=new ArrayList<Double>();
 		// initilisation des moteurs afin debuter la rotation 
-		moteurs.endS();
-		moteurs.l1.setSpeed(100);
-		moteurs.r1.setSpeed(100);
+		moteur.endS();
+		moteur.l1.setSpeed(100);
+		moteur.r1.setSpeed(100);
 
-		// debut de la rotation en faisant appel a Actionneurs.QuartT(90°)
+		// debut de la rotation en faisant appel a Actionneur.QuartT(90°)
 		if(dir) {
-			moteurs.l1.rotate(n*Actionneurs.QuartT,true);
-			moteurs.r1.rotate(-n*Actionneurs.QuartT,true);
+			moteur.l1.rotate(n*Actionneur.QuartT,true);
+			moteur.r1.rotate(-n*Actionneur.QuartT,true);
 		}else {
-			moteurs.l1.rotate(-n*Actionneurs.QuartT,true);
-			moteurs.r1.rotate(n*Actionneurs.QuartT,true);
+			moteur.l1.rotate(-n*Actionneur.QuartT,true);
+			moteur.r1.rotate(n*Actionneur.QuartT,true);
 		}
 
 		// Création d'une ListeTriee qui contiendra l'échantillon sous forme triee
@@ -277,7 +277,7 @@ public class Agents {
 			l.addAll(fenetre);
 
 
-			// ajout de min - max dans rep et suppression du premier element de fenetre
+			// ajout de min - max dans rep et suppression du premier élement de la fenêtre
 			rep.addLast(l.getLast()-l.getFirst());
 			System.out.println(rep.size() +" = "+(l.getLast()-l.getFirst()));
 			distances.add(fenetre.getLast());
@@ -287,7 +287,7 @@ public class Agents {
 
 		}
 
-		// Creation du dictionnaire de dis continuite (relation indice dans la liste-distance percue)
+		// Creation du dictionnaire de discontinuite (relation indice dans la liste-distance percue)
 		HashMap <Integer,Double> dis= new HashMap<Integer,Double>();
 		ListIterator<Double> it=rep.listIterator();
 		int i=0;
@@ -296,18 +296,18 @@ public class Agents {
 		double delta=0.2;
 		
 		
-		// durant les observation nous avons remarquée que les 10 premiere valeurs n'était pas fiable
+		// durant les observation nous avons remarqué que les 10 premieres valeurs n'étaient pas fiables
 		// nous avons donc décidé de ne pas les prendre en compte
 		while (i<10) {
 			it.next();
 			i++;
 		}
 		
-		// parcour
+		// parcours
 		while(it.hasNext()) {
 			c=it.next();
 			/*
-			 * on capte la premiere discontinuité pour l'associer a une seconde (debut ey fin du pallet
+			 * on capte la premiere discontinuité pour l'associer a une seconde (debut et fin du pallet
 			 */
 			if(c>delta) {
 				int i2=i;
@@ -332,9 +332,9 @@ public class Agents {
 		}
 
 
-		moteurs.addAngle(n*90,true);
+		moteur.addAngle(n*90,true);
 		
-		// recuperation de la plus petite distance parmis les pallets
+		// recuperation de la plus petite distance parmis les palets
 		double agl=0;
 		double min=Double.MAX_VALUE;
 		for(Integer k: dis.keySet()) {
@@ -348,49 +348,49 @@ public class Agents {
 			return -1;
 		}
 
-		// pollux ouvre la pince et se retourne vers le pallet
+		// pollux ouvre la pince et se retourne vers le palet
 		double diff= n*90-agl;
-		moteurs.ouvrirPince();
+		moteur.ouvrirPince();
 
 		if(dir) {
 
-			moteurs.tourner(false,diff/90);
+			moteur.tourner(false,diff/90);
 		}else {
-			moteurs.tourner(true,diff/90);
+			moteur.tourner(true,diff/90);
 		}
 		Delay.msDelay(8000);
 		moteurs.speed(850);
 		
-		// pollux avance jusquà detecter un pallet
-		moteurs.startS();
-		moteurs.avance();
-		while(!detectionPallet(false)) {
+		// pollux avance jusquà detecter un palet
+		moteur.startS();
+		moteur.avance();
+		while(!detectionPalet(false)) {
 			eviteRobot();
 
 		}
 		Delay.msDelay(500);
-		moteurs.stop();
-		moteurs.endS();
-		moteurs.fermerPince();
+		moteur.stop();
+		moteur.endS();
+		moteur.fermerPince();
 
 
 
 		/// pollux se retourne vers l'enbut
 		if(dir) {
-			moteurs.tourner(true,1+(diff/90));
+			moteur.tourner(true,1+(diff/90));
 		}else {
-			moteurs.tourner(false,1+(diff/90));
+			moteur.tourner(false,1+(diff/90));
 		}
 		Delay.msDelay(2000);
 		
-		// avance jusqua capter une ligne blache pui dépose le palet
-		moteurs.startS();
-		moteurs.avance();
-		while(capteurs.getColor()!= "white"){
+		// avance jusqu'à capter une ligne blache puis dépose le palet
+		moteur.startS();
+		moteur.avance();
+		while(capteur.getColor()!= "white"){
 		}
-		moteurs.stop();
-		//lache le pallet et se retourne de 90°
-		moteurs.lacherPallet(1);
+		moteur.stop();
+		//lache le palet et se retourne de 90°
+		moteur.lacherPalet(1);
 
 		return agl;
 
@@ -402,8 +402,8 @@ public class Agents {
 	
 
 	/*
-	 * methode majPos que l'on souhaitait utiliser pour mettre a jour en temps reel la position de pollux sur l'espace mais
-	 * plusieur erreur donc pas utiliser
+	 * methode majPos que l'on souhaitait utiliser pour mettre à jour en temps reel la position de pollux sur l'espace mais
+	 * plusieurs erreurs donc pas utilisé
 	 */
 	public String MajPos() {
 		e.changementCase();
