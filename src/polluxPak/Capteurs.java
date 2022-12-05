@@ -47,7 +47,7 @@ public class Capteur {
 	
 	
 	// Initialisation des attributs d'instance en fonction des ports des senseurs sur le robot(s1,s2,s3)
-	public Capteurs (Port s1,Port s3,Port s4) throws IOException {
+	public Capteur (Port s1,Port s3,Port s4) throws IOException {
 		
 		//appel au constructeur de la classe TestColor
 		color=new TestColor (s4);
@@ -69,7 +69,7 @@ public class Capteur {
 	}
 	
 
-	public Capteurs() {
+	public Capteur() {
 		// TODO Auto-generated constructor stub
 	}
 	
