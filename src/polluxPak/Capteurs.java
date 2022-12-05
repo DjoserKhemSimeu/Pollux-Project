@@ -12,32 +12,32 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.robotics.SampleProvider;
 import lejos.robotics.filter.PublishFilter;
 
-public class Capteurs {
+public class Capteur {
 	/*
-	 * La classe capteur représente les capteurs de polux ( touch, couleur, ultrason) et les implémente sous forme d'attribut
+	 * La classe capteur représente les capteurs de Pollux ( touch, couleur, ultrason) et les implémente sous forme d'attribut
 	 */
 	
 	
 	//  le capteur ultrasonic
 	private EV3UltrasonicSensor uss;
 	
-	// Sample Provider nécéssaire a l'utilsation du capteur ultrason
+	// Sample Provider nécessaire a l'utilsation du capteur ultrason
 	private SampleProvider usp;
 	
-	// tableau de float ou sera stocké les valeurs recu par l'ultrason
+	// tableau de float dans lequel seront stockés les valeurs recues par l'ultrason
 	private float[]sampleUltra;
 	
-	//le capteur de toucher
+	// le capteur de toucher
 	private EV3TouchSensor touch;
 	
-	// Sample Provider nécéssaire a l'utilsation du capteur de toucher
+	// Sample Provider nécessaire a l'utilsation du capteur de toucher
 	private SampleProvider tsp;
 	
-	// tableau de float ou sera stocké les valeurs recu par le touchsensor
+	// tableau de float dans lequel seront stockés les valeurs recues par le touchsensor
 	private float[]sampleTouch;
 	
 	
-	//attribut d'instance représentant la frequence utiliser en parametre du constructeur
+	//attribut d'instance représentant la fréquence utilisée en paramètre du constructeur
 	// de la classe PublishFilter
 	public static float frequence=1;
 	
@@ -46,23 +46,23 @@ public class Capteurs {
 	
 	
 	
-	// Initialisation des attribut d'instance en fonction des port des senseur sur le robot(s1,s2,s3)
+	// Initialisation des attributs d'instance en fonction des ports des senseurs sur le robot(s1,s2,s3)
 	public Capteurs (Port s1,Port s3,Port s4) throws IOException {
 		
-		//appele au constructeur de la classe TestColor
+		//appel au constructeur de la classe TestColor
 		color=new TestColor (s4);
 		
-		//appelle au consteur de la classe EV3UltrasonicSensor
+		//appel au constructeur de la classe EV3UltrasonicSensor
 		uss=new EV3UltrasonicSensor(s1);
 		
-		//appelle au consteur de la classe EV3TouchSensor
+		//appel au consteur de la classe EV3TouchSensor
 		touch = new EV3TouchSensor(s3);
 		
 		//initialisation des sample avec le constructeur de la classe PublishFilter
 		usp=new PublishFilter(uss.getDistanceMode(),"Ultrasonic readings", frequence);
 		tsp=new PublishFilter(touch.getTouchMode(),"Touch readings", frequence);
 		
-		// initilisation des tableau permettant de récupérer l'information de toucher et de distance
+		// initilisation des tableaux permettant de récupérer l'information de toucher et de distance
 		sampleUltra=new float [usp.sampleSize()];
 		sampleTouch=new float [tsp.sampleSize()];
 		
